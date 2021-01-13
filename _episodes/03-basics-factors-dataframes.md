@@ -36,12 +36,11 @@ source: Rmd
 
 
 
-
 ## Working with spreadsheets (tabular data)
 
 A substantial amount of the data we work with in genomics will be tabular data,
 this is data arranged in rows and columns - also known as spreadsheets. We could
-write a whole lesson on how to work with spreadsheets effectively ([actually we did](http://www.datacarpentry.org/spreadsheet-ecology-lesson/)). For our
+write a whole lesson on how to work with spreadsheets effectively ([actually we did](https://datacarpentry.org/organization-genomics/)). For our
 purposes, we want to remind you of a few principles before we work with our
 first set of example data:
 
@@ -58,7 +57,7 @@ spreadsheet for each observation or sample, and one column for every variable
 that we measure or report on. As simple as this sounds, it's very easily
 violated. Most data scientists agree that significant amounts of their time is
 spent tidying data for analysis. Read more about data organization in
-[our lesson](http://www.datacarpentry.org/spreadsheet-ecology-lesson/) and
+[our lesson](https://datacarpentry.org/organization-genomics/) and
 in [this paper](https://www.jstatsoft.org/article/view/v059i10).
 
 **3) Trust but verify**
@@ -83,12 +82,11 @@ in your analysis, and its reproducibility.
 > later in the lesson.  
  {: .callout}
 
-
-
 ## Importing tabular data into R
 There are several ways to import data into R. For our purpose here, we will
 focus on using the tools every R installation comes with (so called "base" R) to
-import a comma-delimited file, a sequencing sample submission sheet. We will need to load the sheet using a function called `read.csv()`.
+import a comma-delimited file containing the results of our variant calling workflow.
+We will need to load the sheet using a function called `read.csv()`.
 
 > ## Exercise: Review the arguments of the `read.csv()` function
 >
@@ -111,7 +109,7 @@ import a comma-delimited file, a sequencing sample submission sheet. We will nee
 > D) What argument would you have to change to read in only the first 10,000 rows
 > of a very large file?
 >
->> ## solution
+>> ## Solution
 >>
 >> A) The `read.csv()` function has the argument 'header' set to TRUE by default,
 >> this means the function always assumes the first row is header information,
@@ -139,9 +137,8 @@ import a comma-delimited file, a sequencing sample submission sheet. We will nee
 > {: .solution}
 {: .challenge}
 
-
-Now, let's read in the file `sample_submission.csv` which will be located in
-`/home/dcuser/dc_sample_data/R`. Save the file as `submission_metadata`. The
+Now, let's read in the file `combined_tidy_vcf.csv` which will be located in
+`/home/dcuser/.solutions/R_data/`. Call this data `variants`. The
 first argument to pass to our `read.csv()` function is the file path for our
 data. The file path must be in quotes and now is a good time to remember to
 use tab autocompletion. **If you use tab autocompletion you avoid typos and
@@ -149,15 +146,18 @@ errors in file paths.** Use it!
 
 
 ~~~
-## read in a CSV file and save it as 'submission_metadata'
+## read in a CSV file and save it as 'variants'
 
-submission_metadata <- read.csv("data/sample_submission.csv")
+variants <- read.csv("../r_data/combined_tidy_vcf.csv")
 ~~~
 {: .language-r}
 
+
+
+
 One of the first things you should notice is that in the Environment window,
-you have the `submission_metadata` object, listed as 96 obs. (observations/rows)
-of 10 variables (columns). Double-clicking on the name of the object will open
+you have the `variants` object, listed as 801 obs. (observations/rows)
+of 29 variables (columns). Double-clicking on the name of the object will open
 a view of the data in a new tab.
 
 <img src="../fig/rstudio_dataframeview.png" alt="rstudio data frame view" style="width: 1000px;"/>
@@ -165,58 +165,90 @@ a view of the data in a new tab.
 ## Summarizing and determining the structure of a data frame.
 
 A **data frame is the standard way in R to store tabular data**. A data fame
-could also be thought of as a collect of vectors, all of which have the same
+could also be thought of as a collection of vectors, all of which have the same
 length. Using only two functions, we can learn a lot about out data frame
-including some summary statics as well as well as the "structure" of the data
+including some summary statistics as well as well as the "structure" of the data
 frame. Let's examine what each of these functions can tell us:
 
 
 ~~~
 ## get summary statistics on a data frame
 
-summary(submission_metadata)
+summary(variants)
 ~~~
 {: .language-r}
 
 
 
 ~~~
- well_position  tube_barcode        plate_barcode    client_sample_id
- A1     : 1    Min.   :151017990   LP-10624:96    k255M_1h-2 : 3     
- A10    : 1    1st Qu.:152123658                  k255N_1h-1 : 3     
- A11    : 1    Median :153386891                  k255N_1h-10: 3     
- A12    : 1    Mean   :153306679                  k255N_1h-11: 3     
- A2     : 1    3rd Qu.:154445370                  k255N_1h-12: 3     
- A3     : 1    Max.   :155537812                  k255N_1h-13: 3     
- (Other):90                                       (Other)    :78     
- replicate  Volume..µL.     concentration..ng.µL.      RIN       
- a: 1      Min.   :  0.50   Min.   : 15.82        Min.   :5.600  
- A:31      1st Qu.: 57.35   1st Qu.:183.70        1st Qu.:8.200  
- b: 1      Median : 59.60   Median :197.27        Median :8.500  
- B:31      Mean   : 65.15   Mean   :193.06        Mean   :8.474  
- c: 1      3rd Qu.: 62.50   3rd Qu.:209.97        3rd Qu.:8.900  
- C:31      Max.   :630.10   Max.   :237.12        Max.   :9.600  
-                                                                 
-    prep_date   ship_date 
- 6-Jul-15:45   20-Jul:96  
- 7-Jun-15: 3              
- 7/8/15  :48              
-                          
-                          
-                          
-                          
+  sample_id            CHROM                POS             ID         
+ Length:801         Length:801         Min.   :   1521   Mode:logical  
+ Class :character   Class :character   1st Qu.:1115970   NA's:801      
+ Mode  :character   Mode  :character   Median :2290361                 
+                                       Mean   :2243682                 
+                                       3rd Qu.:3317082                 
+                                       Max.   :4629225                 
+                                                                       
+     REF                ALT                 QUAL          FILTER       
+ Length:801         Length:801         Min.   :  4.385   Mode:logical  
+ Class :character   Class :character   1st Qu.:139.000   NA's:801      
+ Mode  :character   Mode  :character   Median :195.000                 
+                                       Mean   :172.276                 
+                                       3rd Qu.:225.000                 
+                                       Max.   :228.000                 
+                                                                       
+   INDEL              IDV              IMF               DP       
+ Mode :logical   Min.   : 2.000   Min.   :0.5714   Min.   : 2.00  
+ FALSE:700       1st Qu.: 7.000   1st Qu.:0.8824   1st Qu.: 7.00  
+ TRUE :101       Median : 9.000   Median :1.0000   Median :10.00  
+                 Mean   : 9.396   Mean   :0.9219   Mean   :10.57  
+                 3rd Qu.:11.000   3rd Qu.:1.0000   3rd Qu.:13.00  
+                 Max.   :20.000   Max.   :1.0000   Max.   :79.00  
+                 NA's   :700      NA's   :700                     
+      VDB                 RPB              MQB              BQB        
+ Min.   :0.0005387   Min.   :0.0000   Min.   :0.0000   Min.   :0.1153  
+ 1st Qu.:0.2180410   1st Qu.:0.3776   1st Qu.:0.1070   1st Qu.:0.6963  
+ Median :0.4827410   Median :0.8663   Median :0.2872   Median :0.8615  
+ Mean   :0.4926291   Mean   :0.6970   Mean   :0.5330   Mean   :0.7784  
+ 3rd Qu.:0.7598940   3rd Qu.:1.0000   3rd Qu.:1.0000   3rd Qu.:1.0000  
+ Max.   :0.9997130   Max.   :1.0000   Max.   :1.0000   Max.   :1.0000  
+                     NA's   :773      NA's   :773      NA's   :773     
+      MQSB              SGB               MQ0F           ICB         
+ Min.   :0.01348   Min.   :-0.6931   Min.   :0.00000   Mode:logical  
+ 1st Qu.:0.95494   1st Qu.:-0.6762   1st Qu.:0.00000   NA's:801      
+ Median :1.00000   Median :-0.6620   Median :0.00000                 
+ Mean   :0.96428   Mean   :-0.6444   Mean   :0.01127                 
+ 3rd Qu.:1.00000   3rd Qu.:-0.6364   3rd Qu.:0.00000                 
+ Max.   :1.01283   Max.   :-0.4536   Max.   :0.66667                 
+ NA's   :48                                                          
+   HOB                AC          AN        DP4                  MQ       
+ Mode:logical   Min.   :1   Min.   :1   Length:801         Min.   :10.00  
+ NA's:801       1st Qu.:1   1st Qu.:1   Class :character   1st Qu.:60.00  
+                Median :1   Median :1   Mode  :character   Median :60.00  
+                Mean   :1   Mean   :1                      Mean   :58.19  
+                3rd Qu.:1   3rd Qu.:1                      3rd Qu.:60.00  
+                Max.   :1   Max.   :1                      Max.   :60.00  
+                                                                          
+    Indiv              gt_PL               gt_GT   gt_GT_alleles     
+ Length:801         Length:801         Min.   :1   Length:801        
+ Class :character   Class :character   1st Qu.:1   Class :character  
+ Mode  :character   Mode  :character   Median :1   Mode  :character  
+                                       Mean   :1                     
+                                       3rd Qu.:1                     
+                                       Max.   :1                     
+                                                                     
 ~~~
 {: .output}
 
-Our data frame had 10 variables, so we get 10 fields that summarize the data.
-The `tube_barcode`, `Volume..ul.`, `concentration..ng.ul`, `RIN`, variables are
+Our data frame had 29 variables, so we get 29 fields that summarize the data.
+The `QUAL`, `IMF`, and `VDB` variables (and several others) are
 numerical data and so you get summary statistics on the min and max values for
-these columns, as well as mean, median, and interquartile ranges. The other data
-(e.g. `replicate`, etc.) are treated as categorical data (which have special
-treatment in R - more on this in a bit). The top 6 different categories and the
-number of times they appear (e.g. the replicate called 'A' appeared 31 times)
-are displayed. There was only one value for `ship_date`, "20-Jul" which appeared
-96 times.
+these columns, as well as mean, median, and interquartile ranges. Many of the other variables
+(e.g. `sample_id`) are treated as categorical data (which have special
+treatment in R - more on this in a bit). The most frequent 6 different categories and the
+number of times they appear (e.g. the sample_id called 'SRR2584863' appeared 25 times)
+are displayed. There was only one value for `CHROM`, "CP000819.1" which appeared
+in all 801 observations.
 
 Before we operate on the data, we also need to know a little more about the
 data frame structure to do that we use the `str()` function:
@@ -225,32 +257,51 @@ data frame structure to do that we use the `str()` function:
 ~~~
 ## get the structure of a data frame
 
-str(submission_metadata)
+str(variants)
 ~~~
 {: .language-r}
 
 
 
 ~~~
-'data.frame':	96 obs. of  10 variables:
- $ well_position        : Factor w/ 96 levels "A1","A10","A11",..: 1 13 25 37 49 61 73 85 5 17 ...
- $ tube_barcode         : int  151017990 151101577 151142725 151232891 151236606 151323716 151346588 151423653 151462684 151508377 ...
- $ plate_barcode        : Factor w/ 1 level "LP-10624": 1 1 1 1 1 1 1 1 1 1 ...
- $ client_sample_id     : Factor w/ 34 levels "k255M_1h-2","k255N_1h-1",..: 33 33 33 25 25 25 26 26 26 27 ...
- $ replicate            : Factor w/ 6 levels "a","A","b","B",..: 1 3 5 2 4 6 2 4 6 2 ...
- $ Volume..µL.          : num  64.2 63.7 60.2 55.8 60.8 57.5 64.9 62.5 53.9 62.4 ...
- $ concentration..ng.µL.: num  211 220 208 181 191 ...
- $ RIN                  : num  8.1 9.4 8.9 9 8.1 8.6 8.6 8.8 9.5 8.1 ...
- $ prep_date            : Factor w/ 3 levels "6-Jul-15","7-Jun-15",..: 1 1 1 1 1 1 1 1 1 1 ...
- $ ship_date            : Factor w/ 1 level "20-Jul": 1 1 1 1 1 1 1 1 1 1 ...
+'data.frame':	801 obs. of  29 variables:
+ $ sample_id    : chr  "SRR2584863" "SRR2584863" "SRR2584863" "SRR2584863" ...
+ $ CHROM        : chr  "CP000819.1" "CP000819.1" "CP000819.1" "CP000819.1" ...
+ $ POS          : int  9972 263235 281923 433359 473901 648692 1331794 1733343 2103887 2333538 ...
+ $ ID           : logi  NA NA NA NA NA NA ...
+ $ REF          : chr  "T" "G" "G" "CTTTTTTT" ...
+ $ ALT          : chr  "G" "T" "T" "CTTTTTTTT" ...
+ $ QUAL         : num  91 85 217 64 228 210 178 225 56 167 ...
+ $ FILTER       : logi  NA NA NA NA NA NA ...
+ $ INDEL        : logi  FALSE FALSE FALSE TRUE TRUE FALSE ...
+ $ IDV          : int  NA NA NA 12 9 NA NA NA 2 7 ...
+ $ IMF          : num  NA NA NA 1 0.9 ...
+ $ DP           : int  4 6 10 12 10 10 8 11 3 7 ...
+ $ VDB          : num  0.0257 0.0961 0.7741 0.4777 0.6595 ...
+ $ RPB          : num  NA 1 NA NA NA NA NA NA NA NA ...
+ $ MQB          : num  NA 1 NA NA NA NA NA NA NA NA ...
+ $ BQB          : num  NA 1 NA NA NA NA NA NA NA NA ...
+ $ MQSB         : num  NA NA 0.975 1 0.916 ...
+ $ SGB          : num  -0.556 -0.591 -0.662 -0.676 -0.662 ...
+ $ MQ0F         : num  0 0.167 0 0 0 ...
+ $ ICB          : logi  NA NA NA NA NA NA ...
+ $ HOB          : logi  NA NA NA NA NA NA ...
+ $ AC           : int  1 1 1 1 1 1 1 1 1 1 ...
+ $ AN           : int  1 1 1 1 1 1 1 1 1 1 ...
+ $ DP4          : chr  "0,0,0,4" "0,1,0,5" "0,0,4,5" "0,1,3,8" ...
+ $ MQ           : int  60 33 60 60 60 60 60 60 60 60 ...
+ $ Indiv        : chr  "/home/dcuser/dc_workshop/results/bam/SRR2584863.aligned.sorted.bam" "/home/dcuser/dc_workshop/results/bam/SRR2584863.aligned.sorted.bam" "/home/dcuser/dc_workshop/results/bam/SRR2584863.aligned.sorted.bam" "/home/dcuser/dc_workshop/results/bam/SRR2584863.aligned.sorted.bam" ...
+ $ gt_PL        : chr  "121,0" "112,0" "247,0" "91,0" ...
+ $ gt_GT        : int  1 1 1 1 1 1 1 1 1 1 ...
+ $ gt_GT_alleles: chr  "G" "T" "T" "CTTTTTTTT" ...
 ~~~
 {: .output}
 
 Ok, thats a lot up unpack! Some things to notice.
 
 - the object type `data.frame` is displayed in the first row along with its
-  dimensions, in this case 96 observations (rows) and 10 variables (columns)
-- Each variable (column) has a name (e.g. `well_position`). This is followed
+  dimensions, in this case 801 observations (rows) and 29 variables (columns)
+- Each variable (column) has a name (e.g. `sample_id`). This is followed
   by the object mode (e.g. factor, int, num, etc.). Notice that before each
   variable name there is a `$` - this will be important later.
 
@@ -263,247 +314,125 @@ categorial and continuous variables usually have different treatments. Sometimes
 you may want to have data treated as a factor, but in other cases, this may be
 undesirable.
 
-Since some of the data in our data frame are factors, lets see how factors work
-using the `factor()` function to create a factor:
+Since some of the data in our data frame are factors, lets see how factors work. First, we'll
+extract one of the columns of our data frame to a new object, so that we don't end up
+modifying the `variants` object by mistake.
 
 
 ~~~
-## create a factor 'days of the week' by passing a vector of characters
+## extract the "REF" column to a new object
 
-days_of_the_week <- factor(c('monday',
-                             'tuesday',
-                             'wednesday',
-                             'thursday',
-                             'friday'))
+REF <- variants$REF
 ~~~
 {: .language-r}
 
-Notice what happens when we run a line with just the name of our factor:
+Let's look at the first few items in our factor using `head()`:
 
 
 ~~~
-# create a factor 'days of the week' by passing a vector of characters
-
-days_of_the_week
+head(REF)
 ~~~
 {: .language-r}
 
 
 
 ~~~
-[1] monday    tuesday   wednesday thursday  friday   
-Levels: friday monday thursday tuesday wednesday
+[1] "T"        "G"        "G"        "CTTTTTTT" "CCGC"     "C"       
 ~~~
 {: .output}
 
 What we get back are the items in our factor, and also something called "Levels".
 **Levels are the different categories contained in a factor**. By default, R
-will organize the levels in a factor in alphabetical order.
+will organize the levels in a factor in alphabetical order. So the first level in this factor is
+"A".
 
 Lets look at the contents of a factor in a slightly different way using `str()`:
 
 
 ~~~
-str(days_of_the_week)
+str(REF)
 ~~~
 {: .language-r}
 
 
 
 ~~~
- Factor w/ 5 levels "friday","monday",..: 2 4 5 3 1
+ chr [1:801] "T" "G" "G" "CTTTTTTT" "CCGC" "C" "C" "G" ...
 ~~~
 {: .output}
 
 For the sake of efficiency, R stores the content of a factor as a vector of
 integers, which an integer is assigned to each of the possible levels. Recall
-levels are assigned in alphabetical order, so:
-
-|Level|integer|
-|-----|-------|
-|friday|1|
-|monday|2|
-|thursday|3|
-|tuesday|4|
-|wednesday|5|
-
-Notice what happens to the levels if we add some repeated values to our factor:
-
-
-~~~
-# create a factor with repeated values
-more_days_of_the_week <- factor(c('monday',
-                                  'tuesday',
-                                  'wednesday',
-                                  'thursday',
-                                  'friday',
-                                  'friday',
-                                  'friday'))
-str(more_days_of_the_week)
-~~~
-{: .language-r}
-
-
-
-~~~
- Factor w/ 5 levels "friday","monday",..: 2 4 5 3 1 1 1
-~~~
-{: .output}
-
-Going back to our chart above, "friday" is assigned "1" in the factor, and that
-integer is listed three times in our factor. This is slightly obscure, but it
-provides some clarification to why we get this output.
+levels are assigned in alphabetical order. In this case, the first item in our "REF" object is
+"T", which happens to be the 49th level of our factor, ordered alphabeticaly. The next two
+items are both "G"s, which is the 33rd level of our factor.
 
 ## Plotting and ordering factors
 
 One of the most common uses for factors will be when you plot categorical
-values. For example, suppose we want to know how many samples from our sample
-submission were prepped on each date? We could generate a plot:
+values. For example, suppose we want to know how many of our variants had each possible 
+nucleotide (or nucleotide combination) in the reference genome? We could generate a plot:
 
 
 ~~~
-# create a factor with repeated values
-
-plot(table(submission_metadata$prep_date))
+plot(REF)
 ~~~
 {: .language-r}
+
+
+
+~~~
+Warning in xy.coords(x, y, xlabel, ylabel, log): NAs introduced by coercion
+~~~
+{: .warning}
+
+
+
+~~~
+Warning in min(x): no non-missing arguments to min; returning Inf
+~~~
+{: .warning}
+
+
+
+~~~
+Warning in max(x): no non-missing arguments to max; returning -Inf
+~~~
+{: .warning}
+
+
+
+~~~
+Error in plot.window(...): need finite 'ylim' values
+~~~
+{: .error}
 
 <img src="../fig/rmd-03-unnamed-chunk-9-1.png" title="plot of chunk unnamed-chunk-9" alt="plot of chunk unnamed-chunk-9" width="612" style="display: block; margin: auto;" />
 
-Let's quickly brake down this line of code:
+This isn't a particularly pretty example of a plot. We'll be learning much more about creating nice, publication-quality graphics later in this lesson. 
 
-First we are pulling a single column of data from the `submission_metadata` data frame using `$` notation:
+<!-- For now, let's explore how we can order -->
+<!-- the factors in our plot so that the first four values are "A", "C", "G", "T", with multi-nucleotide -->
+<!-- combinations listed alphabetically after these four. -->
 
+<!-- We can take our existing `REF` factor, and use the `factor()` -->
+<!-- function again. This time we will pass it two new arguments: `levels` will be -->
+<!-- assigned to a vector that has the REF values in the order we want them, -->
+<!-- and we will set the `ordered` argument to TRUE. -->
 
-~~~
-# obtain the values of the 'prep_date' variable from the data frame
+<!-- ```{r, purl = FALSE} -->
+<!--  # order the 'REF' factor to match our desired set of levels -->
+<!-- REF <-  -->
+<!-- ```         -->
 
-submission_metadata$prep_date
-~~~
-{: .language-r}
+<!-- We can now see the new ordering: -->
 
+<!-- ```{r, purl = FALSE} -->
 
+<!-- ``` -->
 
-~~~
- [1] 6-Jul-15 6-Jul-15 6-Jul-15 6-Jul-15 6-Jul-15 6-Jul-15 6-Jul-15
- [8] 6-Jul-15 6-Jul-15 6-Jul-15 6-Jul-15 6-Jul-15 6-Jul-15 6-Jul-15
-[15] 6-Jul-15 6-Jul-15 6-Jul-15 6-Jul-15 7-Jun-15 7-Jun-15 7-Jun-15
-[22] 6-Jul-15 6-Jul-15 6-Jul-15 6-Jul-15 6-Jul-15 6-Jul-15 6-Jul-15
-[29] 6-Jul-15 6-Jul-15 6-Jul-15 6-Jul-15 6-Jul-15 6-Jul-15 6-Jul-15
-[36] 6-Jul-15 6-Jul-15 6-Jul-15 6-Jul-15 6-Jul-15 6-Jul-15 6-Jul-15
-[43] 6-Jul-15 6-Jul-15 6-Jul-15 6-Jul-15 6-Jul-15 6-Jul-15 7/8/15  
-[50] 7/8/15   7/8/15   7/8/15   7/8/15   7/8/15   7/8/15   7/8/15  
-[57] 7/8/15   7/8/15   7/8/15   7/8/15   7/8/15   7/8/15   7/8/15  
-[64] 7/8/15   7/8/15   7/8/15   7/8/15   7/8/15   7/8/15   7/8/15  
-[71] 7/8/15   7/8/15   7/8/15   7/8/15   7/8/15   7/8/15   7/8/15  
-[78] 7/8/15   7/8/15   7/8/15   7/8/15   7/8/15   7/8/15   7/8/15  
-[85] 7/8/15   7/8/15   7/8/15   7/8/15   7/8/15   7/8/15   7/8/15  
-[92] 7/8/15   7/8/15   7/8/15   7/8/15   7/8/15  
-Levels: 6-Jul-15 7-Jun-15 7/8/15
-~~~
-{: .output}
-
-Then we use the `table()` function to turn this into a table of counts:
-
-
-~~~
-# generate a table from values of the 'prep_date' variable from the data frame
-
-table(submission_metadata$prep_date)
-~~~
-{: .language-r}
-
-
-
-~~~
-
-6-Jul-15 7-Jun-15   7/8/15 
-      45        3       48 
-~~~
-{: .output}
-
-Finally, we use R's `plot()` function which attempts to generate a plot from the
-data:
-
-
-~~~
-# generate a plot from values of the 'prep_date' variable from the data frame
-
-plot(table(submission_metadata$prep_date))
-~~~
-{: .language-r}
-
-<img src="../fig/rmd-03-unnamed-chunk-12-1.png" title="plot of chunk unnamed-chunk-12" alt="plot of chunk unnamed-chunk-12" width="612" style="display: block; margin: auto;" />
-
-While this is a toy example, and there are problems with our prep dates that
-need fixing, let's see how you order a factor so that we can fix our plot.
-We can take our existing `more_days_of_the_week` factor, and use the `factor()`
-function again. This time we will pass it two new arguments: `levels` will be
-assigned to a vector that has the days of the week in the order we want them,
-and we will set the `ordered` argument to TRUE.
-
-
-~~~
- # order the 'more_days_of_the_week' factor to our desired set of levels
- more_days_of_the_week <- factor(more_days_of_the_week, levels = c("monday",
-                                                                   "tuesday",
-                                                                   "wednesday",
-                                                                   "thursday",
-                                                                   "friday"),
-                                 ordered = TRUE)
-~~~
-{: .language-r}
-
-We can now see the new ordering:
-
-
-~~~
-str(more_days_of_the_week)
-~~~
-{: .language-r}
-
-
-
-~~~
- Ord.factor w/ 5 levels "monday"<"tuesday"<..: 1 2 3 4 5 5 5
-~~~
-{: .output}
-
-Although not all levels are shown, notice there are `<` signs indicating an
-order.
-
-> ## Exercise: Order and plot `sample_submission` `prep_date`
->
-> **Generate a plot of the `prep_date` variable, properly ordered from the `sample_submission`
-> data frame**
->
-> To choose the ordering, assume that the unambiguous dates for this data are:
-> - 7-Jun-15: June 7, 205
-> - 6-Jul-15: July 6, 2015
-> - 7/8/15: July 8, 2015
->
-> *hint*: you can use the `factor()` function inside of your `table()`and `plot()`
-> function calls.
->
-> *hint*: build this single line of code from the inside out!
->
->> ## Solution
->>
->> 
->> ~~~
->> plot(table(factor(submission_metadata$prep_date, levels = c("7-Jun-15",
->>                                                 "6-Jul-15",
->>                                                 "7/8/15"),
->>       ordered = TRUE)))
->> ~~~
->> {: .language-r}
->> 
->> <img src="../fig/rmd-03-unnamed-chunk-15-1.png" title="plot of chunk unnamed-chunk-15" alt="plot of chunk unnamed-chunk-15" width="612" style="display: block; margin: auto;" />
->>
->>
-> {: .solution}
-{: .challenge}
-
+<!-- Although not all levels are shown, notice there are `<` signs indicating an -->
+<!-- order. -->
 
 ## Subsetting data frames
 
@@ -517,60 +446,344 @@ where we are taking a range).
 > ## Exercise: Subsetting a data frame
 >
 > **Try the following indices and functions and try to figure out what they return**
+> 
+> a. `variants[1,1]`
 >
-> a. `submission_metadata[1,1]`
+> b. `variants[2,4]`
 >
-> b. `submission_metadata[2,4]`
+> c. `variants[801,29]`
 >
-> c. `submission_metadata[96,10]`
+> d. `variants[2, ]`
 >
-> d. `submission_metadata[2, ]`
+> e. `variants[-1, ]`
 >
-> e. `submission_metadata[-1, ]`
+> f. `variants[1:4,1]`
 >
-> f. `submission_metadata[1:4,1]`
+> g. `variants[1:10,c("REF","ALT")]`
 >
-> g. `submission_metadata[1:10,c("client_sample_id","RIN")]`
+> h. `variants[,c("sample_id")]`
 >
-> h. `submission_metadata[,c("RIN")]`
+> i. `head(variants)`
 >
-> i. `head(submission_metadata)`
+> j. `tail(variants)`
 >
-> j. `tail(submission_metadata)`
+> k. `variants$sample_id`
 >
-> k. `submission_metadata$prep_date`
+> l. `variants[variants$REF == "A",]`
 >
-> l. `submission_metadata[submission_metadata$RIN >= 9.0,]`
->
->> ## solution
+>> ## Solution
+>> a. 
+>> 
+>> ~~~
+>> variants[1,1]
+>> ~~~
+>> {: .language-r}
+>> 
+>> 
+>> 
+>> ~~~
+>> [1] "SRR2584863"
+>> ~~~
+>> {: .output}
+>> 
+>> b. 
+>> 
+>> ~~~
+>> variants[2,4]
+>> ~~~
+>> {: .language-r}
+>> 
+>> 
+>> 
+>> ~~~
+>> [1] NA
+>> ~~~
+>> {: .output}
+>> 
+>> c. 
+>> 
+>> ~~~
+>> variants[801,29]
+>> ~~~
+>> {: .language-r}
+>> 
+>> 
+>> 
+>> ~~~
+>> [1] "T"
+>> ~~~
+>> {: .output}
+>> 
+>> d. 
+>> 
+>> ~~~
+>> variants[2, ]
+>> ~~~
+>> {: .language-r}
+>> 
+>> 
+>> 
+>> ~~~
+>>    sample_id      CHROM    POS ID REF ALT QUAL FILTER INDEL IDV IMF DP      VDB
+>> 2 SRR2584863 CP000819.1 263235 NA   G   T   85     NA FALSE  NA  NA  6 0.096133
+>>   RPB MQB BQB MQSB       SGB     MQ0F ICB HOB AC AN     DP4 MQ
+>> 2   1   1   1   NA -0.590765 0.166667  NA  NA  1  1 0,1,0,5 33
+>>                                                                Indiv gt_PL
+>> 2 /home/dcuser/dc_workshop/results/bam/SRR2584863.aligned.sorted.bam 112,0
+>>   gt_GT gt_GT_alleles
+>> 2     1             T
+>> ~~~
+>> {: .output}
 >>
->> a. `submission_metadata[1,1]` # 1st row, 1st column
+>> e. 
+>> 
+>> ~~~
+>> variants[-1, ]
+>> ~~~
+>> {: .language-r}
+>> 
+>> 
+>> ~~~
+>>    sample_id      CHROM     POS ID      REF       ALT QUAL FILTER INDEL IDV IMF
+>> 2 SRR2584863 CP000819.1  263235 NA        G         T   85     NA FALSE  NA  NA
+>> 3 SRR2584863 CP000819.1  281923 NA        G         T  217     NA FALSE  NA  NA
+>> 4 SRR2584863 CP000819.1  433359 NA CTTTTTTT CTTTTTTTT   64     NA  TRUE  12 1.0
+>> 5 SRR2584863 CP000819.1  473901 NA     CCGC    CCGCGC  228     NA  TRUE   9 0.9
+>> 6 SRR2584863 CP000819.1  648692 NA        C         T  210     NA FALSE  NA  NA
+>> 7 SRR2584863 CP000819.1 1331794 NA        C         A  178     NA FALSE  NA  NA
+>>   DP      VDB RPB MQB BQB     MQSB       SGB     MQ0F ICB HOB AC AN     DP4 MQ
+>> 2  6 0.096133   1   1   1       NA -0.590765 0.166667  NA  NA  1  1 0,1,0,5 33
+>> 3 10 0.774083  NA  NA  NA 0.974597 -0.662043 0.000000  NA  NA  1  1 0,0,4,5 60
+>> 4 12 0.477704  NA  NA  NA 1.000000 -0.676189 0.000000  NA  NA  1  1 0,1,3,8 60
+>> 5 10 0.659505  NA  NA  NA 0.916482 -0.662043 0.000000  NA  NA  1  1 1,0,2,7 60
+>> 6 10 0.268014  NA  NA  NA 0.916482 -0.670168 0.000000  NA  NA  1  1 0,0,7,3 60
+>> 7  8 0.624078  NA  NA  NA 0.900802 -0.651104 0.000000  NA  NA  1  1 0,0,3,5 60
+>>                                                                Indiv gt_PL
+>> 2 /home/dcuser/dc_workshop/results/bam/SRR2584863.aligned.sorted.bam 112,0
+>> 3 /home/dcuser/dc_workshop/results/bam/SRR2584863.aligned.sorted.bam 247,0
+>> 4 /home/dcuser/dc_workshop/results/bam/SRR2584863.aligned.sorted.bam  91,0
+>> 5 /home/dcuser/dc_workshop/results/bam/SRR2584863.aligned.sorted.bam 255,0
+>> 6 /home/dcuser/dc_workshop/results/bam/SRR2584863.aligned.sorted.bam 240,0
+>> 7 /home/dcuser/dc_workshop/results/bam/SRR2584863.aligned.sorted.bam 208,0
+>>   gt_GT gt_GT_alleles
+>> 2     1             T
+>> 3     1             T
+>> 4     1     CTTTTTTTT
+>> 5     1        CCGCGC
+>> 6     1             T
+>> 7     1             A
+>> ~~~
+>> {: .output}
 >>
->> b. `submission_metadata[2,4]` # 2nd row, 4th column
+>> f. 
+>> 
+>> ~~~
+>> variants[1:4,1]
+>> ~~~
+>> {: .language-r}
+>> 
+>> 
+>> 
+>> ~~~
+>> [1] "SRR2584863" "SRR2584863" "SRR2584863" "SRR2584863"
+>> ~~~
+>> {: .output}
+>> 
+>> g. 
+>> 
+>> ~~~
+>> variants[1:10,c("REF","ALT")]
+>> ~~~
+>> {: .language-r}
+>> 
+>> 
+>> 
+>> ~~~
+>>                                 REF
+>> 1                                 T
+>> 2                                 G
+>> 3                                 G
+>> 4                          CTTTTTTT
+>> 5                              CCGC
+>> 6                                 C
+>> 7                                 C
+>> 8                                 G
+>> 9  ACAGCCAGCCAGCCAGCCAGCCAGCCAGCCAG
+>> 10                               AT
+>>                                                         ALT
+>> 1                                                         G
+>> 2                                                         T
+>> 3                                                         T
+>> 4                                                 CTTTTTTTT
+>> 5                                                    CCGCGC
+>> 6                                                         T
+>> 7                                                         A
+>> 8                                                         A
+>> 9  ACAGCCAGCCAGCCAGCCAGCCAGCCAGCCAGCCAGCCAGCCAGCCAGCCAGCCAG
+>> 10                                                      ATT
+>> ~~~
+>> {: .output}
+>> 
+>> h. 
+>> 
+>> ~~~
+>> variants[,c("sample_id")]
+>> ~~~
+>> {: .language-r}
+>> 
+>> 
+>> ~~~
+>> [1] "SRR2584863" "SRR2584863" "SRR2584863" "SRR2584863" "SRR2584863"
+>> [6] "SRR2584863"
+>> ~~~
+>> {: .output}
 >>
->> c. `submission_metadata[96,10]` # 96th row, 10th column
+>> i. 
+>> 
+>> ~~~
+>> head(variants)
+>> ~~~
+>> {: .language-r}
+>> 
+>> 
+>> 
+>> ~~~
+>>    sample_id      CHROM    POS ID      REF       ALT QUAL FILTER INDEL IDV IMF
+>> 1 SRR2584863 CP000819.1   9972 NA        T         G   91     NA FALSE  NA  NA
+>> 2 SRR2584863 CP000819.1 263235 NA        G         T   85     NA FALSE  NA  NA
+>> 3 SRR2584863 CP000819.1 281923 NA        G         T  217     NA FALSE  NA  NA
+>> 4 SRR2584863 CP000819.1 433359 NA CTTTTTTT CTTTTTTTT   64     NA  TRUE  12 1.0
+>> 5 SRR2584863 CP000819.1 473901 NA     CCGC    CCGCGC  228     NA  TRUE   9 0.9
+>> 6 SRR2584863 CP000819.1 648692 NA        C         T  210     NA FALSE  NA  NA
+>>   DP       VDB RPB MQB BQB     MQSB       SGB     MQ0F ICB HOB AC AN     DP4 MQ
+>> 1  4 0.0257451  NA  NA  NA       NA -0.556411 0.000000  NA  NA  1  1 0,0,0,4 60
+>> 2  6 0.0961330   1   1   1       NA -0.590765 0.166667  NA  NA  1  1 0,1,0,5 33
+>> 3 10 0.7740830  NA  NA  NA 0.974597 -0.662043 0.000000  NA  NA  1  1 0,0,4,5 60
+>> 4 12 0.4777040  NA  NA  NA 1.000000 -0.676189 0.000000  NA  NA  1  1 0,1,3,8 60
+>> 5 10 0.6595050  NA  NA  NA 0.916482 -0.662043 0.000000  NA  NA  1  1 1,0,2,7 60
+>> 6 10 0.2680140  NA  NA  NA 0.916482 -0.670168 0.000000  NA  NA  1  1 0,0,7,3 60
+>>                                                                Indiv gt_PL
+>> 1 /home/dcuser/dc_workshop/results/bam/SRR2584863.aligned.sorted.bam 121,0
+>> 2 /home/dcuser/dc_workshop/results/bam/SRR2584863.aligned.sorted.bam 112,0
+>> 3 /home/dcuser/dc_workshop/results/bam/SRR2584863.aligned.sorted.bam 247,0
+>> 4 /home/dcuser/dc_workshop/results/bam/SRR2584863.aligned.sorted.bam  91,0
+>> 5 /home/dcuser/dc_workshop/results/bam/SRR2584863.aligned.sorted.bam 255,0
+>> 6 /home/dcuser/dc_workshop/results/bam/SRR2584863.aligned.sorted.bam 240,0
+>>   gt_GT gt_GT_alleles
+>> 1     1             G
+>> 2     1             T
+>> 3     1             T
+>> 4     1     CTTTTTTTT
+>> 5     1        CCGCGC
+>> 6     1             T
+>> ~~~
+>> {: .output}
+>> 
+>> j. 
+>> 
+>> ~~~
+>> tail(variants)
+>> ~~~
+>> {: .language-r}
+>> 
+>> 
+>> 
+>> ~~~
+>>      sample_id      CHROM     POS ID REF ALT QUAL FILTER INDEL IDV IMF DP
+>> 796 SRR2589044 CP000819.1 3444175 NA   G   T  184     NA FALSE  NA  NA  9
+>> 797 SRR2589044 CP000819.1 3481820 NA   A   G  225     NA FALSE  NA  NA 12
+>> 798 SRR2589044 CP000819.1 3893550 NA  AG AGG  101     NA  TRUE   4   1  4
+>> 799 SRR2589044 CP000819.1 3901455 NA   A  AC   70     NA  TRUE   3   1  3
+>> 800 SRR2589044 CP000819.1 4100183 NA   A   G  177     NA FALSE  NA  NA  8
+>> 801 SRR2589044 CP000819.1 4431393 NA TGG   T  225     NA  TRUE  10   1 10
+>>           VDB RPB MQB BQB     MQSB       SGB MQ0F ICB HOB AC AN     DP4 MQ
+>> 796 0.4714620  NA  NA  NA 0.992367 -0.651104    0  NA  NA  1  1 0,0,4,4 60
+>> 797 0.8707240  NA  NA  NA 1.000000 -0.680642    0  NA  NA  1  1 0,0,4,8 60
+>> 798 0.9182970  NA  NA  NA 1.000000 -0.556411    0  NA  NA  1  1 0,0,3,1 52
+>> 799 0.0221621  NA  NA  NA       NA -0.511536    0  NA  NA  1  1 0,0,3,0 60
+>> 800 0.9272700  NA  NA  NA 0.900802 -0.651104    0  NA  NA  1  1 0,0,3,5 60
+>> 801 0.7488140  NA  NA  NA 1.007750 -0.670168    0  NA  NA  1  1 0,0,4,6 60
+>>                                                                  Indiv gt_PL
+>> 796 /home/dcuser/dc_workshop/results/bam/SRR2589044.aligned.sorted.bam 214,0
+>> 797 /home/dcuser/dc_workshop/results/bam/SRR2589044.aligned.sorted.bam 255,0
+>> 798 /home/dcuser/dc_workshop/results/bam/SRR2589044.aligned.sorted.bam 131,0
+>> 799 /home/dcuser/dc_workshop/results/bam/SRR2589044.aligned.sorted.bam 100,0
+>> 800 /home/dcuser/dc_workshop/results/bam/SRR2589044.aligned.sorted.bam 207,0
+>> 801 /home/dcuser/dc_workshop/results/bam/SRR2589044.aligned.sorted.bam 255,0
+>>     gt_GT gt_GT_alleles
+>> 796     1             T
+>> 797     1             G
+>> 798     1           AGG
+>> 799     1            AC
+>> 800     1             G
+>> 801     1             T
+>> ~~~
+>> {: .output}
+>> 
+>> k. 
+>> 
+>> ~~~
+>> variants$sample_id
+>> ~~~
+>> {: .language-r}
 >>
->> d. `submission_metadata[2, ]` # The entire 2nd row
+>> 
+>> ~~~
+>> [1] "SRR2584863" "SRR2584863" "SRR2584863" "SRR2584863" "SRR2584863"
+>> [6] "SRR2584863"
+>> ~~~
+>> {: .output}
+>> 
+>> l. 
+>> 
+>> ~~~
+>> variants[variants$REF == "A",]
+>> ~~~
+>> {: .language-r}
 >>
->> e. `submission_metadata[-1, ]` # The entire data frame except the 1st row
->>
->> f. `submission_metadata[1:4,1]` # rows 1-4, column 1
->>
->> g. `submission_metadata[1:10,c("client_sample_id","client_sample_id")]` # rows 1:10, column 'client_sample_id' and 'RIN'
->>
->> h. `submission_metadata[,c("RIN")]` # all rows, column 'RIN'
->>
->> i. `head(submission_metadata)` # first 6 rows of the data frame
->>
->> j. `tail(submission_metadata)` # last 6 rows of the data frame
->>
->> k. `submission_metadata$prep_date` # "prep_date" column, all rows
->>
->> l. `submission_metadata[submission_metadata$RIN >= 9.0,]` # all rows where the value of "RIN" column is greater-than-or-equal-to 9.0
+>> 
+>> ~~~
+>>     sample_id      CHROM     POS ID REF ALT QUAL FILTER INDEL IDV IMF DP
+>> 11 SRR2584863 CP000819.1 2407766 NA   A   C  104     NA FALSE  NA  NA  9
+>> 12 SRR2584863 CP000819.1 2446984 NA   A   C  225     NA FALSE  NA  NA 20
+>> 14 SRR2584863 CP000819.1 2665639 NA   A   T  225     NA FALSE  NA  NA 19
+>> 16 SRR2584863 CP000819.1 3339313 NA   A   C  211     NA FALSE  NA  NA 10
+>> 18 SRR2584863 CP000819.1 3481820 NA   A   G  200     NA FALSE  NA  NA  9
+>> 19 SRR2584863 CP000819.1 3488669 NA   A   C  225     NA FALSE  NA  NA 13
+>>          VDB      RPB      MQB      BQB     MQSB       SGB     MQ0F ICB HOB AC
+>> 11 0.0230738 0.900802 0.150134 0.750668 0.500000 -0.590765 0.333333  NA  NA  1
+>> 12 0.0714027       NA       NA       NA 1.000000 -0.689466 0.000000  NA  NA  1
+>> 14 0.9960390       NA       NA       NA 1.000000 -0.690438 0.000000  NA  NA  1
+>> 16 0.4059360       NA       NA       NA 1.007750 -0.670168 0.000000  NA  NA  1
+>> 18 0.1070810       NA       NA       NA 0.974597 -0.662043 0.000000  NA  NA  1
+>> 19 0.0162706       NA       NA       NA 1.000000 -0.680642 0.000000  NA  NA  1
+>>    AN      DP4 MQ
+>> 11  1  3,0,3,2 25
+>> 12  1 0,0,10,6 60
+>> 14  1 0,0,12,5 60
+>> 16  1  0,0,4,6 60
+>> 18  1  0,0,4,5 60
+>> 19  1  0,0,8,4 60
+>>                                                                 Indiv gt_PL
+>> 11 /home/dcuser/dc_workshop/results/bam/SRR2584863.aligned.sorted.bam 131,0
+>> 12 /home/dcuser/dc_workshop/results/bam/SRR2584863.aligned.sorted.bam 255,0
+>> 14 /home/dcuser/dc_workshop/results/bam/SRR2584863.aligned.sorted.bam 255,0
+>> 16 /home/dcuser/dc_workshop/results/bam/SRR2584863.aligned.sorted.bam 241,0
+>> 18 /home/dcuser/dc_workshop/results/bam/SRR2584863.aligned.sorted.bam 230,0
+>> 19 /home/dcuser/dc_workshop/results/bam/SRR2584863.aligned.sorted.bam 255,0
+>>    gt_GT gt_GT_alleles
+>> 11     1             C
+>> 12     1             C
+>> 14     1             T
+>> 16     1             C
+>> 18     1             G
+>> 19     1             C
+>> ~~~
+>> {: .output}
 > {: .solution}
 {: .challenge}
 
-Essentially, the subsetting notation is very similar to what we learned for
+The subsetting notation is very similar to what we learned for
 vectors. The key differences include:
 
 - Typically provide two values separated by commas: data.frame[row, column]
@@ -579,26 +792,26 @@ vectors. The key differences include:
 - For a non continuous set of numbers, pass a vector using `c()`
 - Index using the name of a column(s) by passing them as vectors using `c()`
 
-Finally, in all of the subsetting exercises above, we simply printed values to
-the screen. Remember that you can create a new data frame object by assigning
+Finally, in all of the subsetting exercises above, we printed values to
+the screen. You can create a new data frame object by assigning
 them to a new object name:
 
 
 ~~~
-# subset submission_metadata to a new data frame with RIN >= 8
+# create a new data frame containing only observations from SRR2584863 
 
-high_quality_rna <- submission_metadata[submission_metadata$RIN >= 8,]
+SRR2584863_variants <- variants[variants$sample_id == "SRR2584863",]
 
 # check the dimension of the data frame
 
-dim(high_quality_rna)
+dim(SRR2584863_variants)
 ~~~
 {: .language-r}
 
 
 
 ~~~
-[1] 86 10
+[1] 25 29
 ~~~
 {: .output}
 
@@ -607,37 +820,69 @@ dim(high_quality_rna)
 ~~~
 # get a summary of the data frame
 
-summary(high_quality_rna)
+summary(SRR2584863_variants)
 ~~~
 {: .language-r}
 
 
 
 ~~~
- well_position  tube_barcode        plate_barcode    client_sample_id
- A1     : 1    Min.   :151017990   LP-10624:86    k255M_1h-2 : 3     
- A10    : 1    1st Qu.:152080214                  k255N_1h-1 : 3     
- A11    : 1    Median :153366715                  k255N_1h-11: 3     
- A12    : 1    Mean   :153266703                  k255N_1h-12: 3     
- A2     : 1    3rd Qu.:154489518                  k255N_1h-13: 3     
- A3     : 1    Max.   :155537812                  k255N_1h-14: 3     
- (Other):80                                       (Other)    :68     
- replicate  Volume..µL.     concentration..ng.µL.      RIN      
- a: 1      Min.   :  0.50   Min.   :157.7         Min.   :8.00  
- A:26      1st Qu.: 57.50   1st Qu.:186.2         1st Qu.:8.30  
- b: 1      Median : 59.70   Median :197.5         Median :8.60  
- B:28      Mean   : 65.94   Mean   :197.9         Mean   :8.61  
- c: 1      3rd Qu.: 62.50   3rd Qu.:211.0         3rd Qu.:8.90  
- C:29      Max.   :630.10   Max.   :237.1         Max.   :9.60  
-                                                                
-    prep_date   ship_date 
- 6-Jul-15:42   20-Jul:86  
- 7-Jun-15: 2              
- 7/8/15  :42              
-                          
-                          
-                          
-                          
+  sample_id            CHROM                POS             ID         
+ Length:25          Length:25          Min.   :   9972   Mode:logical  
+ Class :character   Class :character   1st Qu.:1331794   NA's:25       
+ Mode  :character   Mode  :character   Median :2618472                 
+                                       Mean   :2464989                 
+                                       3rd Qu.:3488669                 
+                                       Max.   :4616538                 
+                                                                       
+     REF                ALT                 QUAL         FILTER       
+ Length:25          Length:25          Min.   : 31.89   Mode:logical  
+ Class :character   Class :character   1st Qu.:104.00   NA's:25       
+ Mode  :character   Mode  :character   Median :211.00                 
+                                       Mean   :172.97                 
+                                       3rd Qu.:225.00                 
+                                       Max.   :228.00                 
+                                                                      
+   INDEL              IDV             IMF               DP      
+ Mode :logical   Min.   : 2.00   Min.   :0.6667   Min.   : 2.0  
+ FALSE:19        1st Qu.: 3.25   1st Qu.:0.9250   1st Qu.: 9.0  
+ TRUE :6         Median : 8.00   Median :1.0000   Median :10.0  
+                 Mean   : 7.00   Mean   :0.9278   Mean   :10.4  
+                 3rd Qu.: 9.75   3rd Qu.:1.0000   3rd Qu.:12.0  
+                 Max.   :12.00   Max.   :1.0000   Max.   :20.0  
+                 NA's   :19      NA's   :19                     
+      VDB               RPB              MQB               BQB        
+ Min.   :0.01627   Min.   :0.9008   Min.   :0.04979   Min.   :0.7507  
+ 1st Qu.:0.07140   1st Qu.:0.9275   1st Qu.:0.09996   1st Qu.:0.7627  
+ Median :0.37674   Median :0.9542   Median :0.15013   Median :0.7748  
+ Mean   :0.40429   Mean   :0.9517   Mean   :0.39997   Mean   :0.8418  
+ 3rd Qu.:0.65951   3rd Qu.:0.9771   3rd Qu.:0.57507   3rd Qu.:0.8874  
+ Max.   :0.99604   Max.   :1.0000   Max.   :1.00000   Max.   :1.0000  
+                   NA's   :22       NA's   :22        NA's   :22      
+      MQSB             SGB               MQ0F           ICB         
+ Min.   :0.5000   Min.   :-0.6904   Min.   :0.00000   Mode:logical  
+ 1st Qu.:0.9599   1st Qu.:-0.6762   1st Qu.:0.00000   NA's:25       
+ Median :0.9962   Median :-0.6620   Median :0.00000                 
+ Mean   :0.9442   Mean   :-0.6341   Mean   :0.04667                 
+ 3rd Qu.:1.0000   3rd Qu.:-0.6168   3rd Qu.:0.00000                 
+ Max.   :1.0128   Max.   :-0.4536   Max.   :0.66667                 
+ NA's   :3                                                          
+   HOB                AC          AN        DP4                  MQ       
+ Mode:logical   Min.   :1   Min.   :1   Length:25          Min.   :10.00  
+ NA's:25        1st Qu.:1   1st Qu.:1   Class :character   1st Qu.:60.00  
+                Median :1   Median :1   Mode  :character   Median :60.00  
+                Mean   :1   Mean   :1                      Mean   :55.52  
+                3rd Qu.:1   3rd Qu.:1                      3rd Qu.:60.00  
+                Max.   :1   Max.   :1                      Max.   :60.00  
+                                                                          
+    Indiv              gt_PL               gt_GT   gt_GT_alleles     
+ Length:25          Length:25          Min.   :1   Length:25         
+ Class :character   Class :character   1st Qu.:1   Class :character  
+ Mode  :character   Mode  :character   Median :1   Mode  :character  
+                                       Mean   :1                     
+                                       3rd Qu.:1                     
+                                       Max.   :1                     
+                                                                     
 ~~~
 {: .output}
 
@@ -678,7 +923,7 @@ typeof(snp_chromosomes)
 {: .output}
 
 Although there are several numbers in our vector, they are all in quotes, so
-we have explicitly told R to consider them characters. However, even if we removed
+we have explicitly told R to consider them as characters. However, even if we removed
 the quotes from the numbers, R would coerce everything into a character:
 
 
@@ -785,7 +1030,7 @@ snp_chromosomes_2 <- as.numeric(snp_chromosomes_2)
 ~~~
 Warning: NAs introduced by coercion
 ~~~
-{: .error}
+{: .warning}
 
 If we check, we will see that an `NA` value (R's default value for missing
 data) has been introduced.
@@ -804,25 +1049,62 @@ snp_chromosomes_2
 {: .output}
 
 Trouble can really start when we try to coerce a factor. For example, when we
-try to coerce the `replicate` column in our data frame into a character mode
+try to coerce the `sample_id` column in our data frame into a numeric mode
 look at the result:
 
 
 ~~~
-as.numeric(submission_metadata$replicate)
+as.numeric(variants$sample_id)
 ~~~
 {: .language-r}
 
 
 
 ~~~
- [1] 1 3 5 2 4 6 2 4 6 2 4 6 2 4 6 2 4 6 2 4 6 2 4 6 2 4 6 2 4 6 2 4 6 2 4
-[36] 6 2 4 6 2 4 6 2 4 6 2 4 6 2 4 6 2 4 6 2 4 6 2 4 6 2 4 6 2 4 6 2 4 6 2
-[71] 4 6 2 4 6 2 4 6 2 4 6 2 4 6 2 4 6 2 4 6 2 4 6 2 4 6
+Warning: NAs introduced by coercion
+~~~
+{: .warning}
+
+
+
+~~~
+  [1] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+ [26] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+ [51] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+ [76] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+[101] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+[126] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+[151] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+[176] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+[201] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+[226] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+[251] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+[276] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+[301] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+[326] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+[351] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+[376] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+[401] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+[426] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+[451] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+[476] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+[501] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+[526] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+[551] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+[576] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+[601] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+[626] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+[651] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+[676] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+[701] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+[726] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+[751] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+[776] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+[801] NA
 ~~~
 {: .output}
 
-Strangely, it works! Almost. Instead of giving and error message, R returns
+Strangely, it works! Almost. Instead of giving an error message, R returns
 numeric values, which in this case are the integers assigned to the levels in
 this factor. This kind of behavior can lead to hard-to-find bugs, for example
 when we do have numbers in a factor, and we get numbers from a coercion. If
@@ -833,12 +1115,12 @@ like this one:
 
 
 ~~~
-# make the 'well_position' column a character type column
+# make the 'REF' column a character type column
  
-submission_metadata$well_position <- as.character(submission_metadata$well_position)
+variants$REF <- as.character(variants$REF)
 
 # check the type of the column
-typeof(submission_metadata$well_position)
+typeof(variants$REF)
 ~~~
 {: .language-r}
 
@@ -849,7 +1131,7 @@ typeof(submission_metadata$well_position)
 ~~~
 {: .output}
 
-## StringsAsFactors=FALSE
+## StringsAsFactors = FALSE
 
 Lets summarize this section on coercion with a few take home messages.
 
@@ -882,35 +1164,20 @@ material [here](https://swcarpentry.github.io/r-novice-inflammation/15-supp-loop
 a subsequent lesson, but overall we will focus on data cleaning and
 visualization.
 
-As you might expect, you can use functions like `mean()`, `min()`, `max()` on an
-individual column:
+You can use functions like `mean()`, `min()`, `max()` on an
+individual column. Let's look at the "DP" or filtered depth. This value shows the number of filtered
+reads that support each of the reported variants.
 
 
 ~~~
-mean(submission_metadata$RIN)
-~~~
-{: .language-r}
-
-
-
-~~~
-[1] 8.473958
-~~~
-{: .output}
-
-You can do math and save the result in a new column:
-
-
-~~~
-submission_metadata$vol_in_L <- submission_metadata$Volume..µL. /10000
-head(submission_metadata$vol_in_L)
+max(variants$DP)
 ~~~
 {: .language-r}
 
 
 
 ~~~
-[1] 0.00642 0.00637 0.00602 0.00558 0.00608 0.00575
+[1] 79
 ~~~
 {: .output}
 
@@ -918,54 +1185,85 @@ You can sort a data frame using the `order()` function:
 
 
 ~~~
-sorted_by_replicate <- submission_metadata[order(submission_metadata$replicate), ]
-head(sorted_by_replicate$replicate)
+sorted_by_DP <- variants[order(variants$DP), ]
+head(sorted_by_DP$DP)
 ~~~
 {: .language-r}
 
 
 
 ~~~
-[1] a A A A A A
-Levels: a A b B c C
+[1] 2 2 2 2 2 2
 ~~~
 {: .output}
 
-You can selectively replace values in a data frame based on their value:
+> ## Exercise
+> The `order()` function lists values in increasing order by default. Look at the documentation
+> for this function and change `sorted_by_DP` to start with variants with the greatest filtered
+> depth ("DP").
+> 
+> > ## Solution
+> > 
+> > ~~~
+> > sorted_by_DP <- variants[order(variants$DP, decreasing = TRUE), ]
+> > head(sorted_by_DP$DP)
+> > ~~~
+> > {: .language-r}
+> > 
+> > 
+> > 
+> > ~~~
+> > [1] 79 46 41 29 29 27
+> > ~~~
+> > {: .output}
+> {: .solution}
+{: .challenge}
 
+<!-- You can selectively replace values in a data frame based on their value: -->
 
-
-~~~
-sorted_by_replicate$replicate[sorted_by_replicate$replicate == "a"] <- "A"
-head(sorted_by_replicate$replicate)
-~~~
-{: .language-r}
-
-
-
-~~~
-[1] A A A A A A
-Levels: a A b B c C
-~~~
-{: .output}
+<!-- ```{r} -->
+<!-- ``` -->
 
 You can rename columns:
 
 
 ~~~
-colnames(submission_metadata)[colnames(submission_metadata) == "Volume..µL."] <- "vol_in_µL"
+colnames(variants)[colnames(variants) == "sample_id"] <- "strain"
 
 # check the column name (hint names are returned as a vector)
-colnames(submission_metadata)[6]
+colnames(variants)
 ~~~
 {: .language-r}
 
 
 
 ~~~
-[1] "vol_in_µL"
+ [1] "strain"        "CHROM"         "POS"           "ID"           
+ [5] "REF"           "ALT"           "QUAL"          "FILTER"       
+ [9] "INDEL"         "IDV"           "IMF"           "DP"           
+[13] "VDB"           "RPB"           "MQB"           "BQB"          
+[17] "MQSB"          "SGB"           "MQ0F"          "ICB"          
+[21] "HOB"           "AC"            "AN"            "DP4"          
+[25] "MQ"            "Indiv"         "gt_PL"         "gt_GT"        
+[29] "gt_GT_alleles"
 ~~~
 {: .output}
+
+## Saving your data frame to a file
+
+We can save data to a file. We will save our `SRR2584863_variants` object
+to a .csv file using the `write.csv()` function:
+
+
+~~~
+write.csv(SRR2584863_variants, file = "../data/SRR2584863_variants.csv")
+~~~
+{: .language-r}
+
+The `write.csv()` function has some additional arguments listed in the help, but
+at a minimum you need to tell it what data frame to write to file, and give a
+path to a file name in quotes (if you only provide a file name, the file will
+be written in the current working directory).
 
 ## Importing data from Excel
 
@@ -977,11 +1275,10 @@ Excel files, are you going to open and export all of them?).
 
 One common R package (a set of code with features you can download and add to
 your R installation) is the [readxl package](https://CRAN.R-project.org/package=readxl) which can open and import Excel
-files. Rather than addressing package installation this second, we can take
+files. Rather than addressing package installation this second (we'll discuss this soon!), we can take
 advantage of RStudio's import feature which integrates this package. (Note:
 this feature is available only in the latest versions of RStudio such as is
 installed on our cloud instance).
-
 
 First, in the RStudio menu go to **File**, select **Import Dataset**, and
 choose **From Excel...** (notice there are several other options you can
@@ -1006,10 +1303,14 @@ In this exercise, we will leave the title of the data frame as
 **Ecoli_metadata**, and there are no other options we need to adjust. Click the
 <KBD>Import</KBD> button to import the data.
 
-Finally, let's check the first few lines of the `Ecoli_metadata` metadata data
+Finally, let's check the first few lines of the `Ecoli_metadata` data
 frame:
 
 
+~~~
+Error: `path` does not exist: '../data/Ecoli_metadata.xlsx'
+~~~
+{: .error}
 
 
 ~~~
@@ -1020,45 +1321,19 @@ head(Ecoli_metadata)
 
 
 ~~~
-# A tibble: 6 x 7
-  sample   generation clade   strain cit     run       genome_size
-  <chr>         <dbl> <chr>   <chr>  <chr>   <chr>           <dbl>
-1 REL606            0 NA      REL606 unknown <NA>             4.62
-2 REL1166A       2000 unknown REL606 unknown SRR098028        4.63
-3 ZDB409         5000 unknown REL606 unknown SRR098281        4.6 
-4 ZDB429        10000 UC      REL606 unknown SRR098282        4.59
-5 ZDB446        15000 UC      REL606 unknown SRR098283        4.66
-6 ZDB458        20000 (C1,C2) REL606 unknown SRR098284        4.63
+Error in head(Ecoli_metadata): object 'Ecoli_metadata' not found
 ~~~
-{: .output}
+{: .error}
 
-Works as we expect! Notice the type of this object is 'tibble', a type of data
-frame we will talk more about in the 'dplyr' section. Of course, if you needed
+The type of this object is 'tibble', a type of data
+frame we will talk more about in the 'dplyr' section. If you needed
 a true R data frame you could coerce with `as.data.frame()`.
-
-## Saving your data frame to a file
-
-Finally, we can conclude this episode with saving our data frame, in this case
-to a .csv file using the `write.csv()` function:
-
-
-~~~
-write.csv(submission_metadata, file = "submission_metatata_cleaned.csv")
-~~~
-{: .language-r}
-The `write.csv()` function has some additional arguments listed in the help, but
-at a minimum you need to tell it what data frame to write to file, and give a
-path to a file name in quotes (if you only provide a file name, the file will
-be written in the current working directory).
 
 > ## Exercise: Putting it all together - data frames
 >
 > **Using the `Ecoli_metadata` data frame created above, answer the following questions**
 >
-> *Hint*: If you did not create the `Ecoli_metadata` data frame, use the
-> instructions above (Importing data from Excel section) to create this object.
->
-> A) What are the dimensions (# rows, #columns) of the data frame?
+> A) What are the dimensions (# rows, # columns) of the data frame?
 >
 > B) What are categories are there in the `cit` column? *hint*: treat column as factor
 >
@@ -1075,22 +1350,115 @@ be written in the current working directory).
 > H) Save the edited Ecoli_metadata data frame as "exercise_solution.csv" in your current working directory.
 >
 >> ## Solution
->>
->> A) `dim(Ecoli_metadata)` # (30 rows, 7 columns)
->>
->> B) `levels(as.factor(Ecoli_metadata$cit))` # "minus"   "plus"    "unknown"
->>
->> C) `table(as.factor(Ecoli_metadata$cit))` # 9 minus, 9 plus, 12 unknown
->>
->> D) `Ecoli_metadata[7,7]` # 4.62
->>
->> E) `median(Ecoli_metadata$genome_size)` # 4.625
->>
->> F) `colnames(Ecoli_metadata)[colnames(Ecoli_metadata) == "sample"]<- "sample_id"`
->>
->> G) `Ecoli_metadata$genome_size_bp <- Ecoli_metadata$genome_size * 1000000`
->>
->> H) `write.csv(Ecoli_metadata, file= "exercise_solution.csv")`
+>> 
+>> ~~~
+>> dim(Ecoli_metadata)
+>> ~~~
+>> {: .language-r}
+>> 
+>> 
+>> 
+>> ~~~
+>> Error in eval(expr, envir, enclos): object 'Ecoli_metadata' not found
+>> ~~~
+>> {: .error}
+>> 
+>> 
+>> 
+>> ~~~
+>> levels(as.factor(Ecoli_metadata$cit))
+>> ~~~
+>> {: .language-r}
+>> 
+>> 
+>> 
+>> ~~~
+>> Error in is.factor(x): object 'Ecoli_metadata' not found
+>> ~~~
+>> {: .error}
+>> 
+>> 
+>> 
+>> ~~~
+>> table(as.factor(Ecoli_metadata$cit))
+>> ~~~
+>> {: .language-r}
+>> 
+>> 
+>> 
+>> ~~~
+>> Error in is.factor(x): object 'Ecoli_metadata' not found
+>> ~~~
+>> {: .error}
+>> 
+>> 
+>> 
+>> ~~~
+>> Ecoli_metadata[7,7]
+>> ~~~
+>> {: .language-r}
+>> 
+>> 
+>> 
+>> ~~~
+>> Error in eval(expr, envir, enclos): object 'Ecoli_metadata' not found
+>> ~~~
+>> {: .error}
+>> 
+>> 
+>> 
+>> ~~~
+>> median(Ecoli_metadata$genome_size)
+>> ~~~
+>> {: .language-r}
+>> 
+>> 
+>> 
+>> ~~~
+>> Error in median(Ecoli_metadata$genome_size): object 'Ecoli_metadata' not found
+>> ~~~
+>> {: .error}
+>> 
+>> 
+>> 
+>> ~~~
+>> colnames(Ecoli_metadata)[colnames(Ecoli_metadata) == "sample"] <- "sample_id"
+>> ~~~
+>> {: .language-r}
+>> 
+>> 
+>> 
+>> ~~~
+>> Error in colnames(Ecoli_metadata)[colnames(Ecoli_metadata) == "sample"] <- "sample_id": object 'Ecoli_metadata' not found
+>> ~~~
+>> {: .error}
+>> 
+>> 
+>> 
+>> ~~~
+>> Ecoli_metadata$genome_size_bp <- Ecoli_metadata$genome_size * 1000000
+>> ~~~
+>> {: .language-r}
+>> 
+>> 
+>> 
+>> ~~~
+>> Error in eval(expr, envir, enclos): object 'Ecoli_metadata' not found
+>> ~~~
+>> {: .error}
+>> 
+>> 
+>> 
+>> ~~~
+>> write.csv(Ecoli_metadata, file = "exercise_solution.csv")
+>> ~~~
+>> {: .language-r}
+>> 
+>> 
+>> 
+>> ~~~
+>> Error in is.data.frame(x): object 'Ecoli_metadata' not found
+>> ~~~
+>> {: .error}
 > {: .solution}
 {: .challenge}
-
