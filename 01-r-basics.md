@@ -12,7 +12,6 @@ source: Rmd
 - Be able to use arithmetic operators on R objects
 - Be able to retrieve (subset), name, or replace, values from a vector
 - Be able to use logical operators in a subsetting operation
-- Understand that lists can hold data of more than one mode and can be indexed
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -23,8 +22,6 @@ source: Rmd
 - What are the most common objects in R?
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
-
-
 
 ## "The fantastic world of R awaits you" OR "Nobody wants to learn how to use R"
 
@@ -52,9 +49,9 @@ below.
 
 **Here are some R skills we will *not* cover in these lessons**
 
-- How to create and work with R matrices and R lists
+- How to create and work with R matrices
 - How to create and work with loops and conditional statements, and the "apply"
-  family of functions (which are super useful, read more [here](https://www.r-bloggers.com/r-tutorial-on-the-apply-family-of-functions/))
+  family of functions (which are super useful, read [this blog post to learn more about these functions](https://www.r-bloggers.com/r-tutorial-on-the-apply-family-of-functions/))
 - How to do basic string manipulations (e.g. finding patterns in text using grep, replacing text)
 - How to plot using the default R graphic tools (we *will* cover plot creation, but will do so using the popular plotting package `ggplot2`)
 - How to use advanced R statistical functions
@@ -81,7 +78,7 @@ need this technical knowledge.
   and applications for R
 - [Programming in R Software Carpentry lesson](https://software-carpentry.org/lessons/):
   There are several Software Carpentry lessons in R to choose from
-  
+
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -103,19 +100,19 @@ in R.
 
 **To create an object you need:**
 
-- a name (e.g. 'a')
+- a name (e.g. 'first_value')
 - a value (e.g. '1')
 - the assignment operator ('\<-')
 
 In your script, "**genomics\_r\_basics.R**", using the R assignment operator '\<-',
-assign '1' to the object 'a' as shown. Remember to leave a comment in the line
+assign '1' to the object 'first_value' as shown. Remember to leave a comment in the line
 above (using the '#') to explain what you are doing:
 
 
-```r
-# this line creates the object 'a' and assigns it the value '1'
+``` r
+# this line creates the object 'first_value' and assigns it the value '1'
 
-a <- 1
+first_value <- 1
 ```
 
 Next, run this line of code in your script. You can run a line of code
@@ -131,7 +128,7 @@ and then hit <KBD>Run</KBD> or use the shortcut key combo listed above.
 In the RStudio 'Console' you should see:
 
 ```output
-a <- 1
+first_value <- 1
 >
 ```
 
@@ -140,12 +137,33 @@ status/warning/error messages (usually in red).
 
 In the 'Environment' window you will also get a table:
 
-| Values              |                                                                                                                                                                                                                                             | 
+| Values              |                                                                                                                                                                                                                                             |
 | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| a                   | 1                                                                                                                                                                                                                                           | 
+| first_value         | 1                                                                                                                                                                                                                                           |
 
 The 'Environment' window allows you to keep track of the objects you have
 created in R.
+
+
+:::::::::::::::::::::::::::::::::::::::::  callout
+
+## Tip: Use of white space for readability
+
+The white spaces surrounding the assignment operator `<-` in the example 
+above (`first_value <- 1`) are unnecessary. However, including them does make your code 
+easier to read. There are several style guides you can follow, and choosing 
+one is up to you, but consistency is key!
+
+A style guide we recommend is the Tidyverse [style guide](https://style.tidyverse.org/). 
+
+As they say:
+
+"Good coding style is like correct punctuation: you can manage without it, butitsuremakesthingseasiertoread."
+
+::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+
 
 :::::::::::::::::::::::::::::::::::::::  challenge
 
@@ -167,7 +185,7 @@ Create the following objects; give each object an appropriate name
 Here as some possible answers to the challenge:
 
 
-```r
+``` r
 human_chr_number <- 23
 gene_name <- 'pten'
 ensemble_url <- 'ftp://ftp.ensemblgenomes.org/pub/bacteria/release-39/fasta/bacteria_5_collection/escherichia_coli_b_str_rel606/'
@@ -196,15 +214,18 @@ Here are some important details about naming objects in R.
   a colored highlight or RStudio gives you a suggested autocompletion you have
   chosen a name that has a reserved meaning.
 - **Use the recommended assignment operator**: In R, we use '\<- ' as the
-  preferred assignment operator. '=' works too, but is most commonly used in
-  passing arguments to functions (more on functions later). There is a shortcut
+  preferred assignment operator, which is recommended by the Tidyverse 
+  [style guide](https://style.tidyverse.org/) discussed above. '=' works too, but is most 
+  commonly used in passing arguments to functions (more on functions later). There is a shortcut
   for the R assignment operator:
   - Windows execution shortcut: <KBD>Alt</KBD>\+<KBD>\-</KBD>
   - Mac execution shortcut: <KBD>Option</KBD>\+<KBD>\-</KBD>
 
 There are a few more suggestions about naming and style you may want to learn
 more about as you write more R code. There are several "style guides" that
-have advice, and one to start with is the [tidyverse R style guide](https://style.tidyverse.org/index.html).
+have advice. One of the more widely used is the [tidyverse R style guide](https://style.tidyverse.org/index.html),
+but there is also a [Google R style guide](https://google.github.io/styleguide/Rguide.html), and
+[Jean Fan's R style guide](https://jef.works/R-style-guide/), among others.
 
 :::::::::::::::::::::::::::::::::::::::::  callout
 
@@ -219,7 +240,7 @@ but R is "not sure"
 about how to assign the name to "human\_ chr\_number" when the object name we
 want is "human\_chr\_number".
 
-<img src="fig/rstudio_script_warning.png" alt="rstudio script warning" style="width: 600px;"/>
+![RStudio script warning](fig/rstudio_script_warning.png)
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -231,7 +252,7 @@ may or may not be a good thing
 depending on how you look at it.
 
 
-```r
+``` r
 # gene_name has the value 'pten' or whatever value you used in the challenge.
 # We will now assign the new value 'tp53'
 gene_name <- 'tp53'
@@ -241,7 +262,7 @@ You can also remove an object from R's memory entirely. The `rm()` function
 will delete the object.
 
 
-```r
+``` r
 # delete the object 'gene_name'
 rm(gene_name)
 ```
@@ -254,22 +275,48 @@ longer exists.
 Error: object 'gene_name' not found
 ```
 
-## Understanding object data types (modes)
+## Understanding object data types (classes and modes)
 
-In R, **every object has two properties**:
+In R, **every object has several properties**:
 
 - **Length**: How many distinct values are held in that object
 - **Mode**: What is the classification (type) of that object.
+- **Class**: A property assigned to an object that determines how a function
+  will operate on it.
 
 We will get to the "length" property later in the lesson. The **"mode" property**
-**corresponds to the type of data an object represents**. The most common modes
-you will encounter in R are:
+**corresponds to the type of data an object represents** and the **"class" property determines how functions will work with that object.**
 
-| Mode (abbreviation) | Type of data                                                                                                                                                                                                                                | 
+
+:::::::::::::::::::::::::::::::::::::::::  callout
+
+## Tip: Classess vs. modes
+
+The difference between modes and classes is a bit **confusing** and the subject of
+several [online discussions](https://stackoverflow.com/questions/35445112/what-is-the-difference-between-mode-and-class-in-r).
+Often, these terms are used interchangeably. Do you really need to know
+the difference?
+
+Well, perhaps. This section is important for you to have a better understanding
+of how R works and how to write usable code. However, you might not come across
+a situation where the difference is crucial while you are taking your first steps
+in learning R. However, the overarching concept—**that objects in R have these properties and that you can use functions to check or change them**—is very important!
+
+In this lesson we will mostly stick to **mode** but we will throw in a few
+examples of the `class()` and `typeof()` so you can see some examples of where
+it may make a difference.
+
+::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+
+The most common modes you will encounter in R are:
+
+| Mode (abbreviation) | Type of data                                                                                                                                                                                                                                |
 | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Numeric (num)       | Numbers such floating point/decimals (1.0, 0.5, 3.14), there are also more specific numeric types (dbl - Double, int - Integer). These differences are not relevant for most beginners and pertain to how these values are stored in memory | 
-| Character (chr)     | A sequence of letters/numbers in single '' or double " " quotes                                                                                                                                                                             | 
-| Logical             | Boolean values - TRUE or FALSE                                                                                                                                                                                                              | 
+| Numeric (num)       | Numbers such floating point/decimals (1.0, 0.5, 3.14), there are also more specific numeric types (dbl - Double, int - Integer). These differences are not relevant for most beginners and pertain to how these values are stored in memory |
+| Character (chr)     | A sequence of letters/numbers in single '' or double " " quotes                                                                                                                                                                             |
+| Logical             | Boolean values - TRUE or FALSE                                                                                                                                                                                                              |
 
 There are a few other modes (i.e. "complex", "raw" etc.) but these
 are the three we will work with in this lesson.
@@ -278,9 +325,9 @@ Data types are familiar in many programming languages, but also in natural
 language where we refer to them as the parts of speech, e.g. nouns, verbs,
 adverbs, etc. Once you know if a word - perhaps an unfamiliar one - is a noun,
 you can probably guess you can count it and make it plural if there is more than
-one (e.g. 1 [Tuatara](https://en.wikipedia.org/wiki/Tuatara), or 2 Tuataras). If
+one (e.g., 1 [Tuatara](https://en.wikipedia.org/wiki/Tuatara), or 2 Tuataras). If
 something is a adjective, you can usually change it into an adverb by adding
-"-ly" (e.g. [jejune](https://www.merriam-webster.com/dictionary/jejune) vs.
+"-ly" (e.g., [jejune](https://www.merriam-webster.com/dictionary/jejune) vs.
 jejunely). Depending on the context, you may need to decide if a word is in one
 category or another (e.g "cut" may be a noun when it's on your finger, or a verb
 when you are preparing vegetables). These concepts have important analogies when
@@ -304,54 +351,118 @@ their modes. Try to guess what the mode will be before you look at the solution
 ## Solution
 
 
-```{.error}
-Error in eval(expr, envir, enclos): object 'Earhart' not found
-```
 
 
-```r
+
+``` r
 mode(chromosome_name)
 ```
 
-```{.output}
+``` output
 [1] "character"
 ```
 
-```r
+``` r
 mode(od_600_value)
 ```
 
-```{.output}
+``` output
 [1] "numeric"
 ```
 
-```r
+``` r
 mode(chr_position)
 ```
 
-```{.output}
+``` output
 [1] "character"
 ```
 
-```r
+``` r
 mode(spock)
 ```
 
-```{.output}
+``` output
 [1] "logical"
 ```
 
-```r
+
+``` r
 mode(pilot)
 ```
 
-```{.error}
-Error in eval(expr, envir, enclos): object 'pilot' not found
+``` error
+Error:
+! object 'pilot' not found
 ```
 
 :::::::::::::::::::::::::
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
+
+:::::::::::::::::::::::::::::::::::::::  challenge
+
+
+## Exercise: Create objects and check their class using "class"
+
+Using the objects created in the previous challenge, use the `class()` function
+to check their classes.
+
+:::::::::::::::  solution
+
+## Solution
+
+
+
+
+
+``` r
+class(chromosome_name)
+```
+
+``` output
+[1] "character"
+```
+
+``` r
+class(od_600_value)
+```
+
+``` output
+[1] "numeric"
+```
+
+``` r
+class(chr_position)
+```
+
+``` output
+[1] "character"
+```
+
+``` r
+class(spock)
+```
+
+``` output
+[1] "logical"
+```
+
+
+``` r
+class(pilot)
+```
+
+``` error
+Error:
+! object 'pilot' not found
+```
+
+:::::::::::::::::::::::::
+
+::::::::::::::::::::::::::::::::::::::::::::::::::
+
+Notice that in the two challenges, `mode()` and `class()` return the same results. This time...
 
 Notice from the solution that even if a series of numbers is given as a value
 R will consider them to be in the "character" mode if they are enclosed as
@@ -364,12 +475,22 @@ called `pilot` that was the **name** "Earhart", we need to enclose
 `Earhart` in quotation marks.
 
 
-```r
+``` r
 pilot <- "Earhart"
 mode(pilot)
 ```
 
-```{.output}
+``` output
+[1] "character"
+```
+
+
+``` r
+pilot <- "Earhart"
+typeof(pilot)
+```
+
+``` output
 [1] "character"
 ```
 
@@ -380,24 +501,24 @@ appropriately manipulate that object. For example, objects of the numeric modes
 can be added, multiplied, divided, etc. R provides several mathematical
 (arithmetic) operators including:
 
-| Operator            | Description                                                                                                                                                                                                                                 | 
+| Operator            | Description                                                                                                                                                                                                                                 |
 | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| \+                   | addition                                                                                                                                                                                                                                    | 
-| \-                   | subtraction                                                                                                                                                                                                                                 | 
-| \*                   | multiplication                                                                                                                                                                                                                              | 
-| /                   | division                                                                                                                                                                                                                                    | 
-| ^ or \*\*             | exponentiation                                                                                                                                                                                                                              | 
-| a%/%b               | integer division (division where the remainder is discarded)                                                                                                                                                                                | 
-| a%%b                | modulus (returns the remainder after division)                                                                                                                                                                                              | 
+| \+                   | addition                                                                                                                                                                                                                                    |
+| \-                   | subtraction                                                                                                                                                                                                                                 |
+| \*                   | multiplication                                                                                                                                                                                                                              |
+| /                   | division                                                                                                                                                                                                                                    |
+| ^ or \*\*             | exponentiation                                                                                                                                                                                                                              |
+| a%/%b               | integer division (division where the remainder is discarded)                                                                                                                                                                                |
+| a%%b                | modulus (returns the remainder after division)                                                                                                                                                                                              |
 
 These can be used with literal numbers:
 
 
-```r
-(1 + (5 ** 0.5))/2
+``` r
+(1 + (5 ** 0.5)) / 2
 ```
 
-```{.output}
+``` output
 [1] 1.618034
 ```
 
@@ -407,13 +528,13 @@ by R) a numeric object:
 
 
 
-```r
+``` r
 # multiply the object 'human_chr_number' by 2
 
 human_chr_number * 2
 ```
 
-```{.output}
+``` output
 [1] 46
 ```
 
@@ -421,25 +542,29 @@ human_chr_number * 2
 
 ## Exercise: Compute the golden ratio
 
+The [golden ratio](https://en.wikipedia.org/wiki/Golden_ratio) is a famous
+mathematical constant associated with beauty, architecture, and [art](https://www.mos.org/leonardo/activities/golden-ratio.html).
+
 One approximation of the golden ratio (φ) can be found by taking the sum of 1
-and the square root of 5, and dividing by 2 as in the example above. Compute
+and the square root of 5, and dividing that sum by 2, as in the example above. Compute
 the golden ratio to 3 digits of precision using the `sqrt()` and `round()`
-functions. Hint: remember the `round()` function can take 2 arguments.
+functions. Hint: the `round()` function can take 2 arguments.
 
 :::::::::::::::  solution
 
 ## Solution
 
 
-```r
-round((1 + sqrt(5))/2, digits = 3)
+``` r
+round((1 + sqrt(5)) / 2, digits = 3)
 ```
 
-```{.output}
+``` output
 [1] 1.618
 ```
 
-Notice that you can place one function inside of another.
+Notice that you can place one function inside of another, and that you can use
+the 'digits' argument to return the desired precision.
 
 
 
@@ -458,7 +583,7 @@ ways to create a vector is to use the `c()` function - the "concatenate" or
 multiple values, separate each value with a comma:
 
 
-```r
+``` r
 # Create the SNP gene name vector
 
 snp_genes <- c("OXTR", "ACTN3", "AR", "OPRM1")
@@ -470,28 +595,28 @@ Another useful function that gives both of these pieces of information is the
 `str()` (structure) function.
 
 
-```r
+``` r
 # Check the mode, length, and structure of 'snp_genes'
 mode(snp_genes)
 ```
 
-```{.output}
+``` output
 [1] "character"
 ```
 
-```r
+``` r
 length(snp_genes)
 ```
 
-```{.output}
+``` output
 [1] 4
 ```
 
-```r
+``` r
 str(snp_genes)
 ```
 
-```{.output}
+``` output
  chr [1:4] "OXTR" "ACTN3" "AR" "OPRM1"
 ```
 
@@ -505,9 +630,10 @@ when we start working with data frames.
 Let's create a few more vectors to play around with:
 
 
-```r
+``` r
 # Some interesting human SNPs
 # while accuracy is important, typos in the data won't hurt you here
+# feel free to copy and paste
 
 snps <- c("rs53576", "rs1815739", "rs6152", "rs1799971")
 snp_chromosomes <- c("3", "11", "X", "6")
@@ -520,13 +646,13 @@ the name of the vector followed by square brackets. In those square brackets
 we place the index (e.g. a number) in that bracket as follows:
 
 
-```r
+``` r
 # get the 3rd value in the snp vector
-snp[3]
+snps[3]
 ```
 
-```{.error}
-Error in eval(expr, envir, enclos): object 'snp' not found
+``` output
+[1] "rs6152"
 ```
 
 In R, every item your vector is indexed, starting from the first item (1)
@@ -534,14 +660,14 @@ through to the final number of items in your vector. You can also retrieve a
 range of numbers:
 
 
-```r
+``` r
 # get the 1st through 3rd value in the snp vector
 
-snp[1:3]
+snps[1:3]
 ```
 
-```{.error}
-Error in eval(expr, envir, enclos): object 'snp' not found
+``` output
+[1] "rs53576"   "rs1815739" "rs6152"   
 ```
 
 If you want to retrieve several (but not necessarily sequential) items from
@@ -549,14 +675,14 @@ a vector, you pass a **vector of indices**; a vector that has the numbered
 positions you wish to retrieve.
 
 
-```r
+``` r
 # get the 1st, 3rd, and 4th value in the snp vector
 
-snp[c(1, 3, 4)]
+snps[c(1, 3, 4)]
 ```
 
-```{.error}
-Error in eval(expr, envir, enclos): object 'snp' not found
+``` output
+[1] "rs53576"   "rs6152"    "rs1799971"
 ```
 
 There are additional (and perhaps less commonly used) ways of subsetting a
@@ -565,14 +691,14 @@ examples](https://thomasleeper.com/Rcourse/Tutorials/vectorindexing.html)).
 Also, several of these subsetting expressions can be combined:
 
 
-```r
+``` r
 # get the 1st through the 3rd value, and 4th value in the snp vector
 # yes, this is a little silly in a vector of only 4 values.
-snp[c(1:3,4)]
+snps[c(1:3, 4)]
 ```
 
-```{.error}
-Error in eval(expr, envir, enclos): object 'snp' not found
+``` output
+[1] "rs53576"   "rs1815739" "rs6152"    "rs1799971"
 ```
 
 ## Adding to, removing, or replacing values in existing vectors
@@ -581,7 +707,7 @@ Once you have an existing vector, you may want to add a new item to it. To do
 so, you can use the `c()` function again to add your new value:
 
 
-```r
+``` r
 # add the gene "CYP1A1" and "APOA5" to our list of snp genes
 # this overwrites our existing vector
 snp_genes <- c(snp_genes, "CYP1A1", "APOA5")
@@ -590,11 +716,11 @@ snp_genes <- c(snp_genes, "CYP1A1", "APOA5")
 We can verify that "snp\_genes" contains the new gene entry
 
 
-```r
+``` r
 snp_genes
 ```
 
-```{.output}
+``` output
 [1] "OXTR"   "ACTN3"  "AR"     "OPRM1"  "CYP1A1" "APOA5" 
 ```
 
@@ -602,35 +728,35 @@ Using a negative index will return a version of a vector with that index's
 value removed:
 
 
-```r
+``` r
 snp_genes[-6]
 ```
 
-```{.output}
+``` output
 [1] "OXTR"   "ACTN3"  "AR"     "OPRM1"  "CYP1A1"
 ```
 
 We can remove that value from our vector by overwriting it with this expression:
 
 
-```r
+``` r
 snp_genes <- snp_genes[-6]
 snp_genes
 ```
 
-```{.output}
+``` output
 [1] "OXTR"   "ACTN3"  "AR"     "OPRM1"  "CYP1A1"
 ```
 
 We can also explicitly rename or add a value to our index using double bracket notation:
 
 
-```r
-snp_genes[6]<- "APOA5"
+``` r
+snp_genes[6] <- "APOA5"
 snp_genes
 ```
 
-```{.output}
+``` output
 [1] "OXTR"   "ACTN3"  "AR"     "OPRM1"  "CYP1A1" "APOA5" 
 ```
 
@@ -646,7 +772,7 @@ B) All vectors have a mode **and** a length
 C) Vectors may have different lengths  
 D) Items within a vector may be of different modes  
 E) You can use the `c()` to add one or more items to an existing vector  
-F) You can use the `c()` to add a vector to an exiting vector
+F) You can use the `c()` to add a vector to an existing vector
 
 :::::::::::::::  solution
 
@@ -671,27 +797,27 @@ F) True
 There is one last set of cool subsetting capabilities we want to introduce. It is possible within R to retrieve items in a vector based on a logical evaluation or numerical comparison. For example, let's say we wanted get all of the SNPs in our vector of SNP positions that were greater than 100,000,000. We could index using the '>' (greater than) logical operator:
 
 
-```r
+``` r
 snp_positions[snp_positions > 100000000]
 ```
 
-```{.output}
+``` output
 [1] 154039662
 ```
 
 In the square brackets you place the name of the vector followed by the comparison operator and (in this case) a numeric value. Some of the most common logical operators you will use in R are:
 
-| Operator            | Description                                                                                                                                                                                                                                 | 
+| Operator            | Description                                                                                                                                                                                                                                 |
 | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| \<                   | less than                                                                                                                                                                                                                                   | 
-| \<=                  | less than or equal to                                                                                                                                                                                                                       | 
-| \>                   | greater than                                                                                                                                                                                                                                | 
-| \>=                  | greater than or equal to                                                                                                                                                                                                                    | 
-| \==                  | exactly equal to                                                                                                                                                                                                                            | 
-| !=                  | not equal to                                                                                                                                                                                                                                | 
-| !x                  | not x                                                                                                                                                                                                                                       | 
-| a | b               | a or b                                                                                                                                                                                                                                      | 
-| a \& b               | a and b                                                                                                                                                                                                                                     | 
+| \<                   | less than                                                                                                                                                                                                                                   |
+| \<=                  | less than or equal to                                                                                                                                                                                                                       |
+| \>                   | greater than                                                                                                                                                                                                                                |
+| \>=                  | greater than or equal to                                                                                                                                                                                                                    |
+| \==                  | exactly equal to                                                                                                                                                                                                                            |
+| !=                  | not equal to                                                                                                                                                                                                                                |
+| !x                  | not x                                                                                                                                                                                                                                       |
+| a \| b               | a or b                                                                                                                                                                                                                                      |
+| a \& b               | a and b                                                                                                                                                                                                                                     |
 
 :::::::::::::::::::::::::::::::::::::::::  callout
 
@@ -702,11 +828,11 @@ can be better understood if you examine what the expression "snp\_positions > 10
 evaluates to:
 
 
-```r
+``` r
 snp_positions > 100000000
 ```
 
-```{.output}
+``` output
 [1] FALSE FALSE FALSE  TRUE
 ```
 
@@ -714,11 +840,11 @@ The output above is a logical vector, the 4th element of which is TRUE. When
 you pass a logical vector as an index, R will return the true values:
 
 
-```r
+``` r
 snp_positions[c(FALSE, FALSE, FALSE, TRUE)]
 ```
 
-```{.output}
+``` output
 [1] 154039662
 ```
 
@@ -737,11 +863,11 @@ We can use the `which()` function to return the indices of any item that
 evaluates as TRUE in our comparison:
 
 
-```r
+``` r
 which(snp_positions > 100000000)
 ```
 
-```{.output}
+``` output
 [1] 4
 ```
 
@@ -753,12 +879,12 @@ pre-determined value (e.g 100000000) we can use an object that can take on
 whatever value we need. So for example:
 
 
-```r
+``` r
 snp_marker_cutoff <- 100000000
 snp_positions[snp_positions > snp_marker_cutoff]
 ```
 
-```{.output}
+``` output
 [1] 154039662
 ```
 
@@ -777,14 +903,14 @@ but the `is.NA()` function will return a logical vector, with TRUE for any NA
 value:
 
 
-```r
-# current value of 'snp_genes': 
+``` r
+# current value of 'snp_genes':
 # chr [1:7] "OXTR" "ACTN3" "AR" "OPRM1" "CYP1A1" NA "APOA5"
 
 is.na(snp_genes)
 ```
 
-```{.output}
+``` output
 [1] FALSE FALSE FALSE FALSE FALSE FALSE
 ```
 
@@ -794,19 +920,39 @@ will return TRUE for any value in your collection that is in
 the vector you are searching:
 
 
-```r
+``` r
 # current value of 'snp_genes':
 # chr [1:7] "OXTR" "ACTN3" "AR" "OPRM1" "CYP1A1" NA "APOA5"
 
-# test to see if "ACTN3" or "APO5A" is in the snp_genes vector
+# test to see if "ACTN3", "APO5A", or "actn3" is in the snp_genes vector
 # if you are looking for more than one value, you must pass this as a vector
 
-c("ACTN3","APOA5") %in% snp_genes
+c("ACTN3","APOA5", "actn3") %in% snp_genes
 ```
 
-```{.output}
-[1] TRUE TRUE
+``` output
+[1]  TRUE  TRUE FALSE
 ```
+
+Notice that the gene "actn3" is FALSE? This is because character vectors are case sensitive, so
+keep this in mind when subsetting and selecting values from a character vector. 
+
+:::::::::::::::::::::::::::::::::::::::::  callout
+
+## Tip: What's the difference between the `%in% and the `==` operators?
+
+The `%in%` operator is used to test if the elements of a vector are
+present in another vector. In the example above, if both "ACTN3" and "APOA5" are in
+the vector `snp_genes`, then R will return `TRUE TRUE` since they are both present.
+If "ACTN3" is but "APOA5" is not in `snp_genes`, then R will return `TRUE FALSE`. The `==` operator
+is used to test if two vectors are exactly equal. For example, if you wanted to know if the vector `c(1, 2, 3)`
+was equal to the vector `c(1, 2, 3)`, you could use the `==` operator. One trick people sometimes
+use is to check a single value against a vector with the `==` operator. For example, if you wanted to know
+if the value `1` was in the vector `c(1, 2, 3)`, you could use the expression `1 == c(1, 2, 3)`. This would
+return `TRUE FALSE FALSE` since the value `1` is only in the first position of the vector `c(1, 2, 3)`. Note that
+`c(1, 2) == c(1, 2, 3)` will return an error since the vectors are of different lengths.
+
+::::::::::::::::::::::::::::::::::::::::::::::::::
 
 :::::::::::::::::::::::::::::::::::::::  challenge
 
@@ -822,27 +968,27 @@ c. `snp_positions`
 ## Solution
 
 
-```r
+``` r
 mode(snps)
 ```
 
-```{.output}
+``` output
 [1] "character"
 ```
 
-```r
+``` r
 mode(snp_chromosomes)
 ```
 
-```{.output}
+``` output
 [1] "character"
 ```
 
-```r
+``` r
 mode(snp_positions)
 ```
 
-```{.output}
+``` output
 [1] "numeric"
 ```
 
@@ -864,30 +1010,30 @@ c. To the `snp_positions` vector add: 	116792991
 ## Solution
 
 
-```r
+``` r
 snps <- c(snps, "rs662799")
 snps
 ```
 
-```{.output}
+``` output
 [1] "rs53576"   "rs1815739" "rs6152"    "rs1799971" "rs662799" 
 ```
 
-```r
+``` r
 snp_chromosomes <- c(snp_chromosomes, "11") # did you use quotes?
 snp_chromosomes
 ```
 
-```{.output}
+``` output
 [1] "3"  "11" "X"  "6"  "11"
 ```
 
-```r
+``` r
 snp_positions <- c(snp_positions, 116792991)
 snp_positions
 ```
 
-```{.output}
+``` output
 [1]   8762685  66560624  67545785 154039662 116792991
 ```
 
@@ -914,13 +1060,13 @@ b. Add 2 NA values to the end of `snp_genes`
 ## Solution
 
 
-```r
+``` r
 snp_genes <- snp_genes[-5]
 snp_genes <- c(snp_genes, NA, NA)
 snp_genes
 ```
 
-```{.output}
+``` output
 [1] "OXTR"  "ACTN3" "AR"    "OPRM1" "APOA5" NA      NA     
 ```
 
@@ -944,12 +1090,12 @@ Using indexing, create a new vector named `combined` that contains:
 ## Solution
 
 
-```r
+``` r
 combined <- c(snp_genes[1], snps[1], snp_chromosomes[1], snp_positions[1])
 combined
 ```
 
-```{.output}
+``` output
 [1] "OXTR"    "rs53576" "3"       "8762685"
 ```
 
@@ -968,11 +1114,11 @@ What type of data is `combined`?
 ## Solution
 
 
-```r
+``` r
 typeof(combined)
 ```
 
-```{.output}
+``` output
 [1] "character"
 ```
 
@@ -980,7 +1126,9 @@ typeof(combined)
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
-## Bonus material: Lists
+:::::::::::::::::::::::::::::::::::::::::  callout
+
+## Lists
 
 Lists are quite useful in R, but we won't be using them in the genomics lessons.
 That said, you may come across lists in the way that some bioinformatics
@@ -991,7 +1139,7 @@ tutorial](https://r4ds.had.co.nz/vectors.html#lists). In this one example, we wi
 a named list and show you how to retrieve items from the list.
 
 
-```r
+``` r
 # Create a named list using the 'list' function and our SNP examples
 # Note, for easy reading we have placed each item in the list on a separate line
 # Nothing special about this, you can do this for any multiline commands
@@ -1007,7 +1155,7 @@ snp_data <- list(genes = snp_genes,
 str(snp_data)
 ```
 
-```{.output}
+``` output
 List of 4
  $ genes         : chr [1:7] "OXTR" "ACTN3" "AR" "OPRM1" ...
  $ refference_snp: chr [1:5] "rs53576" "rs1815739" "rs6152" "rs1799971" ...
@@ -1018,35 +1166,34 @@ List of 4
 To get all the values for the `position` object in the list, we use the `$` notation:
 
 
-```r
+``` r
 # return all the values of position object
 
 snp_data$position
 ```
 
-```{.output}
+``` output
 [1]   8762685  66560624  67545785 154039662 116792991
 ```
 
 To get the first value in the `position` object, use the `[]` notation to index:
 
 
-```r
+``` r
 # return first value of the position object
 
 snp_data$position[1]
 ```
 
-```{.output}
+``` output
 [1] 8762685
 ```
+:::::::::::::::::::::::::::::::::::::::::
 
 :::::::::::::::::::::::::::::::::::::::: keypoints
 
-- Effectively using R is a journey of months or years. Still you don't have to be an expert to use R and you can start using and analyzing your data with with about a day's worth of training
+- Effectively using R is a journey of months or years. Still, you don't have to be an expert to use R and you can start using and analyzing your data with about a day's worth of training.
 - It is important to understand how data are organized by R in a given object type and how the mode of that type (e.g. numeric, character, logical, etc.) will determine how R will operate on that data.
 - Working with vectors effectively prepares you for understanding how data are organized in R.
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
-
-

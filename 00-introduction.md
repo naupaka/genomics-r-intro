@@ -41,7 +41,7 @@ instances provided to you at a genomics workshop. Much of this work could be
 done on your laptop, but we use instances to simplify workshop setup
 requirements, and to get you familiar with using the cloud (a common
 requirement for working with big data).
-Visit the [Genomics Workshop setup page](https://www.datacarpentry.org/genomics-workshop/setup.html)
+Visit the [Genomics Workshop setup page](https://datacarpentry.org/genomics-workshop/index.html#setup)
 for details on getting this instance running on your own, or for the info you
 need to do this on your own computer.
 
@@ -50,7 +50,7 @@ need to do this on your own computer.
 
 ## A Brief History of R
 
-[R](https://en.wikipedia.org/wiki/R_\(programming_language\)) has been around
+[The programming language R](https://en.wikipedia.org/wiki/R_\(programming_language\)) has been around
 since 1995, and was created by Ross Ihaka and Robert Gentleman at the University
 of Auckland, New Zealand. R is based off the S programming language developed
 at Bell Labs and was developed to teach intro statistics. See this [slide deck](https://www.stat.auckland.ac.nz/~ihaka/downloads/Massey.pdf)
@@ -113,6 +113,14 @@ http://ec2.12.2.45.678.compute-1.amazonaws.com:8787
 
 :::::::::::::::::::::::::::::::::::::::::  callout
 
+## Warning: Browser and VPN usage
+
+The AWS link may not work for some browsers (e.g. Microsoft Edge). For those browsers, you may need to copy the link and paste it into your browser instead of clicking the link in the spreadsheet. Also, if you are using a VPN, you may need to disconnect in order to reach the server.
+
+::::::::::::::::::::::::::::::::::::::::::::::::::
+
+:::::::::::::::::::::::::::::::::::::::::  callout
+
 ## Tip: Make sure there are no spaces before or after your URL.
 
 If your URL has spaces, your web browser may interpret it as a search query.
@@ -142,16 +150,32 @@ called an **RStudio Project**. An RStudio project allows you to more easily:
 - Restart work where you left off
 - Collaborate, especially if you are using version control such as [git](https://swcarpentry.github.io/git-novice/).
 
+Using an RStudio project also has the key benefit of correctly setting your working directory when in an R session.
+This is important because R will look for files in the working directory by default.
+If you don't set your working directory, you may have to specify the full path (the location on your drive) to a
+file every time you want to read or write it. Sometimes people will use `setwd()` to manually
+set the working directory for a script, but this is not recommended because this approach requires the working directory to be
+set every time you run your script, and can cause problems if you share your script with others or run it on a different machine.
+RStudio project directories can be moved to a different location on the computer, or moved to a different computer, and they will
+still work correctly because the working directory is set relative to the project directory (it sets the working directory as the directory with
+the `.Rproj` file).
+
 1. To create a project, go to the <kbd>File</kbd> menu, and click <kbd>New Project...</kbd>.
 
 <img src="fig/new_project_window.png" alt="rstudio default session" style="width: 600px;"/>
 
-2. In the window that opens select **New Directory**, then **New Project**. For
-  "Directory name:" enter **dc\_genomics\_r**. For "Create project as subdirectory of", click <kbd>Browse...</kbd> and then click <kbd>Choose</kbd> which will select your home directory "~".
+2. If you already have created the **dc\_workshop** directory in
+  a previous lesson, you should select **Existing Directory** and navigate to
+  and select that directory. If you have not created this directory yet, select
+  **New Directory** and continue with the steps below.
 
-3. Finally click <kbd>Create Project</kbd>. In the "Files" tab of your output
+3. In the window that opens select **New Directory**, then **New Project**. For
+  "Directory name:" enter **dc\_workshop**. For "Create project as subdirectory of",
+  click <kbd>Browse...</kbd> and then click <kbd>Choose</kbd> which will select your home directory "~".
+
+4. Finally click <kbd>Create Project</kbd>. In the "Files" tab of your output
   pane (more about the RStudio layout in a moment), you should see an RStudio
-  project file, **dc\_genomics\_r.Rproj**. All RStudio projects end with the
+  project file, **dc\_workshop.Rproj**. All RStudio projects end with the
   "**.Rproj**" file extension.
 
 :::::::::::::::::::::::::::::::::::::::::  callout
@@ -186,6 +210,16 @@ click the <kbd>File</kbd> menu and select <kbd>save</kbd>. In the "Save File"
 window that opens, name your file **"genomics\_r\_basics"**. The new script
 **genomics\_r\_basics.R** should appear under "files" in the output pane. By
 convention, R scripts end with the file extension **.R**.
+
+
+::::::::::::::::::::::::::::::::::::: callout
+
+## Tip: Save your script now
+
+Remember to save your script at this point. Anything can happen during your
+lesson and you don't want to lose your work!
+
+::::::::::::::::::::::::::::::::::::::::::::::::
 
 ## Overview and customization of the RStudio layout
 
@@ -255,7 +289,7 @@ First, lets see what directory we are in. To do so, type the following command
 into the script:
 
 
-```r
+``` r
 getwd()
 ```
 
@@ -266,7 +300,7 @@ line of your script in the header of the Source pane.
 In the console, we expect to see the following output\*:
 
 ```output
-[1] "/home/dcuser/dc_genomics_r"
+[1] "/home/dcuser/dc_workshop"
 ```
 
 \* Notice, at the Console, you will also see the instruction you executed
@@ -279,7 +313,7 @@ not try to interpret as code. Edit your script to include a comment on the
 purpose of commands you are learning, e.g.:
 
 
-```r
+``` r
 # this command shows the current working directory
 getwd()
 ```
@@ -310,7 +344,7 @@ What if you weren't? You can set your home directory using the `setwd()`
 command. Enter this command in your script, but *don't run* this yet.
 
 
-```r
+``` r
 # This sets the working directory
 setwd()
 ```
@@ -320,12 +354,12 @@ what directory you want to set as your working directory. To do so, inside of
 the parentheses, open a set of quotes. Inside the quotes enter a `/` which is
 the root directory for Linux. Next, use the <KBD>Tab</KBD> key, to take
 advantage of RStudio's Tab-autocompletion method, to select `home`, `dcuser`,
-and `dc_genomics_r` directory. The path in your script should look like this:
+and `dc_workshop` directory. The path in your script should look like this:
 
 
-```r
+``` r
 # This sets the working directory
-setwd("/home/dcuser/dc_genomics_r")
+setwd("/home/dcuser/dc_workshop")
 ```
 
 When you run this command, the console repeats the command, but gives you no
@@ -343,9 +377,9 @@ a step in your script. For example, what if your script is being on a computer
 that has a different directory structure? The top-level path in a Unix file
 system is root `/`, but on Windows it is likely `C:\`. This is one of several
 ways you might cause a script to break because a file path is configured
-differently than your script anticipates. R packages like [here](https://cran.r-project.org/package=here)
-and [file.path](https://www.rdocumentation.org/packages/base/versions/3.4.3/topics/file.path)
-allow you to specify file paths is a way that is more operating system
+differently than your script anticipates. R packages like ['here'](https://cran.r-project.org/package=here)
+and ['file.path'](https://www.rdocumentation.org/packages/base/versions/3.4.3/topics/file.path)
+allow you to specify file paths in a way that is more operating system
 independent. See Jenny Bryan's [blog post](https://www.tidyverse.org/articles/2017/12/workflow-vs-script/) for this
 and other R tips.
 
@@ -403,12 +437,12 @@ function's behavior. For example the function `round()` will round a number
 with a decimal:
 
 
-```r
+``` r
 # This will round a number to the nearest integer
 round(3.14)
 ```
 
-```{.output}
+``` output
 [1] 3
 ```
 
@@ -420,7 +454,7 @@ do this, but you may first need to read the help to find out how. To see the hel
 name:
 
 
-```r
+``` r
 ?round()
 ```
 
@@ -431,12 +465,12 @@ also see what arguments we can pass to this function to modify its behavior.
 You can also see a function's argument using the `args()` function:
 
 
-```r
+``` r
 args(round)
 ```
 
-```{.output}
-function (x, digits = 0) 
+``` output
+function (x, digits = 0, ...) 
 NULL
 ```
 
@@ -449,11 +483,11 @@ a different value. We can explicitly set the digits parameter when we call the
 function:
 
 
-```r
+``` r
 round(3.14159, digits = 2)
 ```
 
-```{.output}
+``` output
 [1] 3.14
 ```
 
@@ -463,18 +497,18 @@ when we used `args()`. In the case below that means that `x` is 3.14159 and
 digits is 2.
 
 
-```r
+``` r
 round(3.14159, 2)
 ```
 
-```{.output}
+``` output
 [1] 3.14
 ```
 
 Finally, what if you are using `?` to get help for a function in a package not installed on your system, such as when you are running a script which has dependencies.
 
 
-```r
+``` r
 ?geom_point()
 ```
 
@@ -498,11 +532,12 @@ the `help.search()` function.
 
 Use `help.search()` to find R functions for the following statistical
 functions. Remember to put your search query in quotes inside the function's
-parentheses.
+parentheses. Also note that Google or your favorite search engine is a good
+place to start as well. It can be helpful to include "R" in your search query.
 
 - Chi-Squared test
 - Student t-test
-- mixed linear model
+- linear model
 
 :::::::::::::::  solution
 
@@ -513,9 +548,9 @@ find:
 
 - Chi-Squared test: `stats::Chisquare`
 - Student t-test: `stats::t.test`
-- mixed linear model: `stats::lm.glm`
-  
-  
+- linear model: `stats::lm.glm`
+
+
 
 :::::::::::::::::::::::::
 
@@ -545,5 +580,3 @@ for each of these arguments.
 - RStudio allows you to run R in an easy-to-use interface and makes it easy to find help
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
-
-

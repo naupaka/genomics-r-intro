@@ -69,7 +69,7 @@ in your analysis, and its reproducibility.
 
 :::::::::::::::::::::::::::::::::::::::::  callout
 
-## Tip: Keeping you raw data separate
+## Tip: Keep your raw data separate
 
 When you work with data in R, you are not changing the original file you
 loaded that data from. This is different than (for example) working with
@@ -141,6 +141,20 @@ have time to cover. Look here to get familiar with functions you use
 frequently, you may be surprised at what you find they can do.
 
 
+:::::::::::::::::::::::::::::::::::::::::  callout
+
+## Tip: Why does ?read.csv open the documentations to read.table?
+
+The reason for this is because `read.csv` is actually a short cut 
+for `read.table("file.csv", sep = ",")`. You can see in the help 
+documentation that there are several additional variations of 
+`read.table`, such as `read.csv2` to read tables separated by `;` 
+and `read.delim` to read in tables separated by `\t` (tabs). If you know how your table is separated, you can use one of the provided short cuts, 
+but case you run into an unconventional separator you are now equipped with the knowledge to define it in the `sep = ` argument of `read.table`!
+
+
+::::::::::::::::::::::::::::::::::::::::::::::::::
+
 
 :::::::::::::::::::::::::
 
@@ -154,7 +168,7 @@ use tab autocompletion. **If you use tab autocompletion you avoid typos and
 errors in file paths.** Use it!
 
 
-```r
+``` r
 ## read in a CSV file and save it as 'variants'
 
 variants <- read.csv("/home/dcuser/r_data/combined_tidy_vcf.csv")
@@ -167,24 +181,44 @@ you have the `variants` object, listed as 801 obs. (observations/rows)
 of 29 variables (columns). Double-clicking on the name of the object will open
 a view of the data in a new tab.
 
-<img src="fig/rstudio_dataframeview.png" alt="rstudio data frame view" style="width: 1000px;"/>
+![RStudio data frame view](fig/rstudio_dataframeview.png)
+
+The majority of the columns in the data frame correspond to standard fields found in a 
+*Variant Call Format (VCF)* file, while others were added during our data processing. The VCF 
+format is a standard format for storing variant calls (also known as Single Nucleotide Polymorphisms or SNPs),
+and you can read more about it, including a description of the fields we have here 
+in [the VCF specification](https://samtools.github.io/hts-specs/VCFv4.2.pdf) 
+or [on wikipedia](https://en.wikipedia.org/wiki/Variant_Call_Format).
+
+We can also quickly query the dimensions of the variable using `dim()`. You'll see that the first number `801` shows the number of rows, then `29` the number of columns
+
+
+``` r
+## get summary statistics on a data frame
+
+dim(variants)
+```
+
+``` output
+[1] 801  29
+```
 
 ## Summarizing, subsetting, and determining the structure of a data frame.
 
-A **data frame is the standard way in R to store tabular data**. A data fame
+A **data frame is the standard way in R to store tabular data**. A data frame
 could also be thought of as a collection of vectors, all of which have the same
 length. Using only two functions, we can learn a lot about out data frame
 including some summary statistics as well as well as the "structure" of the data
 frame. Let's examine what each of these functions can tell us:
 
 
-```r
+``` r
 ## get summary statistics on a data frame
 
 summary(variants)
 ```
 
-```{.output}
+``` output
   sample_id            CHROM                POS             ID         
  Length:801         Length:801         Min.   :   1521   Mode:logical  
  Class :character   Class :character   1st Qu.:1115970   NA's:801      
@@ -203,7 +237,7 @@ summary(variants)
                                                                        
    INDEL              IDV              IMF               DP       
  Mode :logical   Min.   : 2.000   Min.   :0.5714   Min.   : 2.00  
- FALSE:700       1st Qu.: 7.000   1st Qu.:0.8824   1st Qu.: 7.00  
+ FALSE:700       1st Qu.: 7.000   1st Qu.:0.8823   1st Qu.: 7.00  
  TRUE :101       Median : 9.000   Median :1.0000   Median :10.00  
                  Mean   : 9.396   Mean   :0.9219   Mean   :10.57  
                  3rd Qu.:11.000   3rd Qu.:1.0000   3rd Qu.:13.00  
@@ -250,27 +284,32 @@ these columns, as well as mean, median, and interquartile ranges. Many of the
 other variables (e.g. `sample_id`) are treated as characters data (more on this
 in a bit).
 
-There is a lot to work with, so we will subset the first three columns into a
-new data frame using the `data.frame()` function.
+There is a lot to work with, so we will subset the columns into a new data frame using
+the `data.frame()` function. To subset/index a two dimensional variable, we need to
+define them on the appropriate side of the brackets. The left hand side of the comma
+indicates the rows you want to subset, and the right is the column position 
+(e.g. ["row index", "column index"]).
+
+Let's put the columns 1, 2, 3, and 6 into a new data frame called subset:
 
 
-```r
-## put the first three columns of variants into a new data frame called subset
-
-subset<-data.frame(variants[,c(1:3,6)])
+``` r
+## Notice that we are wrapping the numbers in a c() function, to indicate a vector
+## in the right hand side of the comma. 
+subset <- data.frame(variants[, c(1:3, 6)])
 ```
 
 Now, let's use the `str()` (structure) function to look a little more closely
 at how data frames work:
 
 
-```r
+``` r
 ## get the structure of a data frame
 
 str(subset)
 ```
 
-```{.output}
+``` output
 'data.frame':	801 obs. of  4 variables:
  $ sample_id: chr  "SRR2584863" "SRR2584863" "SRR2584863" "SRR2584863" ...
  $ CHROM    : chr  "CP000819.1" "CP000819.1" "CP000819.1" "CP000819.1" ...
@@ -278,28 +317,77 @@ str(subset)
  $ ALT      : chr  "G" "T" "T" "CTTTTTTTT" ...
 ```
 
-Ok, thats a lot up unpack! Some things to notice.
+Ok, that's a lot up unpack! Some things to notice.
 
-- the object type `data.frame` is displayed in the first row along with its
+- The object type `data.frame` is displayed in the first row along with its
   dimensions, in this case 801 observations (rows) and 4 variables (columns)
-- Each variable (column) has a name (e.g. `sample_id`). This is followed
-  by the object mode (e.g. chr, int, etc.). Notice that before each
+- Each variable (column) has a name (e.g. `sample_id`). Notice that before each
   variable name there is a `$` - this will be important later.
+- Each variable name is followed by the data type it contains (e.g. chr, int, etc.). 
+  The `int` type shows an integer, which is a type of numerical data, where it can only 
+  store whole numbers (i.e. no decimal points ).
+
+
+  :::::::::::::::::::::::::::::::::::::::  challenge
+
+  ## Exercise: Revisiting modes and classes
+
+  Remember when we said mode and class are sometimes different? If you do, here
+  is a chance to check. What happens when you try the following?
+
+  1. `mode(variants)`
+  2. `class(variants)`
+
+  :::::::::::::::  solution
+
+  ## Solution
+
+
+
+  
+  ``` r
+  mode(variants)
+  ```
+  
+  ``` output
+  [1] "list"
+  ```
+
+
+
+  
+  ``` r
+  class(variants)
+  ```
+  
+  ``` output
+  [1] "data.frame"
+  ```
+
+  This result makes sense because `mode()` (which deals with how an object is stored)
+  tells us that `variants` is treated as a **list** in R. A data frame is in some sense a "fancy" list.
+  However, data frames do have some specific properties beyond that of a basic list, so they have their own
+  class (**data.frame**), which is important for functions (and programmers) to know.
+  :::::::::::::::::::::::::
+
+  ::::::::::::::::::::::::::::::::::::::::::::::::::
+
 
 ## Introducing Factors
 
 Factors are the final major data structure we will introduce in our R genomics
 lessons. Factors can be thought of as vectors which are specialized for
 categorical data. Given R's specialization for statistics, this make sense since
-categorial and continuous variables are usually treated differently. Sometimes
+categorical and continuous variables are usually treated differently. Sometimes
 you may want to have data treated as a factor, but in other cases, this may be
 undesirable.
 
-Let's see the value of treating some of which are categorical in nature as
-factors. Let's take a look at just the alternate alleles
+Let's explore the value of treating some vectors that are categorical in nature as
+factors. To do this we'll take a look at just the alternate alleles. We can use the `$` operator 
+to access or extract a column by its name in data frames (or to extract objects within named lists).
 
 
-```r
+``` r
 ## extract the "ALT" column to a new object
 
 alt_alleles <- subset$ALT
@@ -308,21 +396,119 @@ alt_alleles <- subset$ALT
 Let's look at the first few items in our factor using `head()`:
 
 
-```r
+``` r
 head(alt_alleles)
 ```
 
-```{.output}
+``` output
 [1] "G"         "T"         "T"         "CTTTTTTTT" "CCGCGC"    "T"        
 ```
 
 There are 801 alleles (one for each row). To simplify, lets look at just the
-single-nuleotide alleles (SNPs). We can use some of the vector indexing skills
-from the last episode.
+single-nucleotide alleles (SNPs). 
+
+Let's review some of the vector indexing skills from the last episode that can help:
 
 
-```r
-snps <- c(alt_alleles[alt_alleles=="A"],
+``` r
+# This will find all matching alleles with the single nucleotide "A" and provide a TRUE/FASE vector
+alt_alleles == "A"
+```
+
+``` output
+  [1] FALSE FALSE FALSE FALSE FALSE FALSE  TRUE  TRUE FALSE FALSE FALSE FALSE
+ [13] FALSE FALSE  TRUE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+ [25] FALSE FALSE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE
+ [37]  TRUE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE  TRUE FALSE FALSE FALSE
+ [49] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+ [61] FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE  TRUE FALSE FALSE FALSE
+ [73] FALSE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+ [85] FALSE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+ [97] FALSE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+[109] FALSE FALSE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+[121] FALSE FALSE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+[133] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+[145] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+[157] FALSE FALSE  TRUE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE
+[169] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+[181] FALSE FALSE FALSE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE
+[193]  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+[205] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE FALSE FALSE
+[217] FALSE FALSE  TRUE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE
+[229] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE FALSE
+[241] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+[253] FALSE FALSE FALSE FALSE FALSE  TRUE FALSE  TRUE  TRUE FALSE FALSE FALSE
+[265] FALSE  TRUE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+[277]  TRUE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE  TRUE
+[289] FALSE FALSE FALSE FALSE FALSE FALSE  TRUE FALSE  TRUE  TRUE FALSE FALSE
+[301] FALSE  TRUE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE  TRUE FALSE  TRUE
+[313] FALSE FALSE FALSE FALSE  TRUE FALSE  TRUE  TRUE FALSE FALSE  TRUE FALSE
+[325] FALSE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE FALSE  TRUE FALSE FALSE  TRUE
+[337] FALSE FALSE  TRUE FALSE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE
+[349] FALSE  TRUE  TRUE  TRUE FALSE  TRUE FALSE FALSE FALSE  TRUE FALSE FALSE
+[361] FALSE FALSE FALSE  TRUE  TRUE  TRUE  TRUE FALSE  TRUE FALSE FALSE FALSE
+[373] FALSE FALSE FALSE  TRUE FALSE  TRUE FALSE FALSE  TRUE FALSE FALSE  TRUE
+[385] FALSE FALSE FALSE  TRUE FALSE  TRUE FALSE  TRUE FALSE FALSE FALSE  TRUE
+[397]  TRUE FALSE  TRUE  TRUE  TRUE FALSE FALSE  TRUE  TRUE FALSE FALSE  TRUE
+[409] FALSE FALSE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE  TRUE  TRUE FALSE
+[421] FALSE  TRUE FALSE  TRUE  TRUE FALSE  TRUE FALSE  TRUE FALSE FALSE FALSE
+[433]  TRUE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE  TRUE FALSE FALSE FALSE
+[445]  TRUE  TRUE  TRUE  TRUE FALSE  TRUE  TRUE  TRUE FALSE  TRUE FALSE  TRUE
+[457]  TRUE  TRUE FALSE  TRUE FALSE  TRUE FALSE FALSE  TRUE  TRUE  TRUE  TRUE
+[469]  TRUE  TRUE FALSE FALSE  TRUE  TRUE  TRUE  TRUE FALSE FALSE FALSE  TRUE
+[481] FALSE FALSE  TRUE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+[493]  TRUE FALSE FALSE FALSE  TRUE  TRUE FALSE FALSE FALSE FALSE  TRUE  TRUE
+[505]  TRUE  TRUE  TRUE  TRUE FALSE FALSE FALSE  TRUE FALSE  TRUE FALSE FALSE
+[517] FALSE FALSE FALSE  TRUE  TRUE FALSE FALSE FALSE FALSE FALSE  TRUE FALSE
+[529] FALSE FALSE  TRUE FALSE FALSE  TRUE FALSE FALSE  TRUE  TRUE  TRUE FALSE
+[541]  TRUE FALSE FALSE  TRUE FALSE  TRUE  TRUE  TRUE FALSE FALSE FALSE FALSE
+[553] FALSE FALSE FALSE FALSE  TRUE  TRUE FALSE FALSE FALSE  TRUE  TRUE  TRUE
+[565] FALSE  TRUE FALSE  TRUE  TRUE  TRUE FALSE  TRUE  TRUE FALSE FALSE  TRUE
+[577] FALSE FALSE  TRUE  TRUE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE
+[589] FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE  TRUE
+[601] FALSE FALSE FALSE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE
+[613] FALSE FALSE FALSE FALSE FALSE  TRUE FALSE  TRUE FALSE  TRUE  TRUE FALSE
+[625]  TRUE  TRUE FALSE FALSE FALSE FALSE FALSE  TRUE  TRUE FALSE FALSE FALSE
+[637] FALSE FALSE FALSE  TRUE  TRUE  TRUE FALSE  TRUE FALSE FALSE FALSE FALSE
+[649]  TRUE  TRUE  TRUE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE
+[661] FALSE FALSE FALSE  TRUE  TRUE  TRUE  TRUE FALSE FALSE  TRUE FALSE FALSE
+[673]  TRUE FALSE  TRUE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+[685] FALSE  TRUE  TRUE FALSE  TRUE FALSE  TRUE  TRUE FALSE FALSE  TRUE  TRUE
+[697]  TRUE FALSE FALSE  TRUE  TRUE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE
+[709] FALSE FALSE FALSE FALSE  TRUE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE
+[721] FALSE FALSE FALSE FALSE  TRUE FALSE FALSE  TRUE FALSE FALSE FALSE FALSE
+[733]  TRUE FALSE  TRUE FALSE FALSE  TRUE  TRUE FALSE  TRUE FALSE  TRUE FALSE
+[745] FALSE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE  TRUE  TRUE
+[757] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE FALSE FALSE
+[769] FALSE  TRUE FALSE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE FALSE  TRUE
+[781] FALSE FALSE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE
+[793]  TRUE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+```
+
+``` r
+# Then, we wrap them into an index to pull all the positions that match this. 
+alt_alleles[alt_alleles == "A"]
+```
+
+``` output
+  [1] "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A"
+ [19] "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A"
+ [37] "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A"
+ [55] "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A"
+ [73] "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A"
+ [91] "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A"
+[109] "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A"
+[127] "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A"
+[145] "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A"
+[163] "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A"
+[181] "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A"
+[199] "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A"
+```
+
+``` r
+# If we repeat this for each nucleotide A, T, G, and C, and connect them using `c()`,
+# we can index all the single nucleotide changes.
+snps <- c(alt_alleles[alt_alleles == "A"],
   alt_alleles[alt_alleles=="T"],
   alt_alleles[alt_alleles=="G"],
   alt_alleles[alt_alleles=="C"])
@@ -335,44 +521,56 @@ example, we can try to generate a plot of this character vector as it is right
 now:
 
 
-```r
+``` r
 plot(snps)
 ```
 
-```{.warning}
+``` warning
 Warning in xy.coords(x, y, xlabel, ylabel, log): NAs introduced by coercion
 ```
 
-```{.warning}
+``` warning
 Warning in min(x): no non-missing arguments to min; returning Inf
 ```
 
-```{.warning}
+``` warning
 Warning in max(x): no non-missing arguments to max; returning -Inf
 ```
 
-```{.error}
-Error in plot.window(...): need finite 'ylim' values
+``` error
+Error in `plot.window()`:
+! need finite 'ylim' values
 ```
 
 Whoops! Though the `plot()` function will do its best to give us a quick plot,
-it is unable to do so here. One way to fix this it to tell R to treat the SNPs
+it is unable to do so here. Let's use `str()` to see why this might be:
+
+
+``` r
+str(snps)
+```
+
+``` output
+ chr [1:707] "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" "A" ...
+```
+
+R may not know how to plot a character vector! One way to fix this it to tell R to treat the SNPs
 as categories (i.e. a factor vector); we will create a new object to avoid
 confusion using the `factor()` function:
 
 
-```r
+``` r
 factor_snps <- factor(snps)
 ```
 
 Let's learn a little more about this new type of vector:
 
 
-```r
+``` r
 str(factor_snps)
 ```
 
-```{.output}
+``` output
  Factor w/ 4 levels "A","C","G","T": 1 1 1 1 1 1 1 1 1 1 ...
 ```
 
@@ -392,16 +590,26 @@ the first few items in our factor are all "A"s.
 We can see how many items in our vector fall into each category:
 
 
-```r
+``` r
 summary(factor_snps)
 ```
 
-```{.output}
+``` output
   A   C   G   T 
 211 139 154 203 
 ```
 
-As you can imagine, this is already useful when you want to generate a tally.
+``` r
+# Compare the character vector 
+summary(snps)
+```
+
+``` output
+   Length     Class      Mode 
+      707 character character 
+```
+
+As you can imagine, factors are already useful when you want to generate a tally.
 
 :::::::::::::::::::::::::::::::::::::::::  callout
 
@@ -423,11 +631,11 @@ values. For example, suppose we want to know how many of our variants had each
 possible SNP we could generate a plot:
 
 
-```r
+``` r
 plot(factor_snps)
 ```
 
-<img src="fig/03-basics-factors-dataframes-rendered-unnamed-chunk-14-1.png" style="display: block; margin: auto;" />
+<img src="fig/03-basics-factors-dataframes-rendered-unnamed-chunk-18-1.png" alt="" style="display: block; margin: auto;" />
 
 This isn't a particularly pretty example of a plot but it works. We'll be
 learning much more about creating nice, publication-quality graphics later in
@@ -439,7 +647,7 @@ What if we wanted to order our plot according to the numerical value (i.e.,
 in descending order of SNP frequency)? We can enforce an order on our factors:
 
 
-```r
+``` r
 ordered_factor_snps <- factor(factor_snps, levels = names(sort(table(factor_snps))))
 ```
 
@@ -460,11 +668,11 @@ to see why this works):
 Now we see our plot has be reordered:
 
 
-```r
+``` r
 plot(ordered_factor_snps)
 ```
 
-<img src="fig/03-basics-factors-dataframes-rendered-unnamed-chunk-16-1.png" style="display: block; margin: auto;" />
+<img src="fig/03-basics-factors-dataframes-rendered-unnamed-chunk-20-1.png" alt="" style="display: block; margin: auto;" />
 
 Factors come in handy in many places when using R. Even using more
 sophisticated plotting packages such as ggplot2 will sometimes require you
@@ -475,26 +683,50 @@ to understand how to manipulate factors.
 ## Tip: Packages in R -- what are they and why do we use them?
 
 Packages are simply collections of functions and/or data that can be used to extend the
-capabilities of R beyond the core functionality that comes with it by default. There are
-useful R packages available that span all types of statistical analysis, data visualization,
-and more. The main place that R packages are installed from is a website called
-[CRAN](https://cran.r-project.org/) (the Comprehensive R Archive Network). Many thousands
-of R packages are available there, and when you use the built-in R function `install.packages()`,
-it will look for a CRAN repository to install from. So, for example, to install
-[tidyverse](https://www.tidyverse.org) packages such as `dplyr` and `ggplot2`
+capabilities of R beyond the core functionality that comes with it by default. The default set of functions and packages that come 'in the box' when you install R for the first time on a given computer are called 'base R'. However, one of the major benefits of using an open source programming language is that there are thousands of useful R packages freely available that span all types of statistical analysis, data visualization,
+and more. The main place that these additional R packages are made available is from a website called the Comprehensive R Archive Network ([CRAN](https://cran.r-project.org/)).  When you use the built-in R function `install.packages()`,
+it will look on CRAN for the package and install it on your computer. So, for example, to install packages such as `dplyr` and `ggplot2`
 (which you'll do in the next few lessons), you would use the following command:
 
 
-```r
+``` r
 # install a package from CRAN
 install.packages("ggplot2")
 ```
 
-```{.output}
-Installing ggplot2 [3.4.2] ...
-	OK [linked cache in 0.25 milliseconds]
-* Installed 1 package in 1.4 seconds.
+``` output
+# Downloading packages -------------------------------------------------------
+- Downloading ggplot2 4.0.2 from CRAN ...       OK [8.1 Mb in 0.65s]
+Successfully downloaded 1 package in 2.1 seconds.
+
+The following package(s) will be installed:
+- ggplot2 [4.0.2]
+These packages will be installed into "~/work/genomics-r-intro/genomics-r-intro/renv/profiles/lesson-requirements/renv/library/linux-ubuntu-jammy/R-4.5/x86_64-pc-linux-gnu".
+
+# Installing packages --------------------------------------------------------
+- Installing ggplot2 4.0.2 ...                  OK [installed binary and cached in 0.96s]
+Successfully installed 1 package in 1.1 seconds.
 ```
+
+``` r
+install.packages("dplyr")
+```
+
+``` output
+# Downloading packages -------------------------------------------------------
+- Downloading dplyr 1.2.0 from CRAN ...         OK [1.5 Mb in 0.44s]
+Successfully downloaded 1 package in 0.7 seconds.
+
+The following package(s) will be installed:
+- dplyr [1.2.0]
+These packages will be installed into "~/work/genomics-r-intro/genomics-r-intro/renv/profiles/lesson-requirements/renv/library/linux-ubuntu-jammy/R-4.5/x86_64-pc-linux-gnu".
+
+# Installing packages --------------------------------------------------------
+- Installing dplyr 1.2.0 ...                    OK [installed binary and cached in 0.51s]
+Successfully installed 1 package in 0.54 seconds.
+```
+
+These two packages are among the most popular add on packages used in R, and they are part of a large set of very useful packages called the [tidyverse](https://www.tidyverse.org). Packages in the tidyverse are designed to work well together and are made to work with tidy data (which we described earlier in this lesson).
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -544,44 +776,44 @@ l. `variants[variants$REF == "A",]`
 a.
 
 
-```r
-variants[1,1]
+``` r
+variants[1, 1]
 ```
 
-```{.output}
+``` output
 [1] "SRR2584863"
 ```
 
 b.
 
 
-```r
-variants[2,4]
+``` r
+variants[2, 4]
 ```
 
-```{.output}
+``` output
 [1] NA
 ```
 
 c.
 
 
-```r
-variants[801,29]
+``` r
+variants[801, 29]
 ```
 
-```{.output}
+``` output
 [1] "T"
 ```
 
 d.
 
 
-```r
+``` r
 variants[2, ]
 ```
 
-```{.output}
+``` output
    sample_id      CHROM    POS ID REF ALT QUAL FILTER INDEL IDV IMF DP      VDB
 2 SRR2584863 CP000819.1 263235 NA   G   T   85     NA FALSE  NA  NA  6 0.096133
   RPB MQB BQB MQSB       SGB     MQ0F ICB HOB AC AN     DP4 MQ
@@ -595,12 +827,12 @@ variants[2, ]
 e.
 
 
-```r
+``` r
 variants[-1, ]
 ```
 
 
-```{.output}
+``` output
    sample_id      CHROM     POS ID      REF       ALT QUAL FILTER INDEL IDV IMF
 2 SRR2584863 CP000819.1  263235 NA        G         T   85     NA FALSE  NA  NA
 3 SRR2584863 CP000819.1  281923 NA        G         T  217     NA FALSE  NA  NA
@@ -634,22 +866,22 @@ variants[-1, ]
 f.
 
 
-```r
-variants[1:4,1]
+``` r
+variants[1:4, 1]
 ```
 
-```{.output}
+``` output
 [1] "SRR2584863" "SRR2584863" "SRR2584863" "SRR2584863"
 ```
 
 g.
 
 
-```r
-variants[1:10,c("REF","ALT")]
+``` r
+variants[1:10, c("REF", "ALT")]
 ```
 
-```{.output}
+``` output
                                 REF
 1                                 T
 2                                 G
@@ -677,12 +909,12 @@ variants[1:10,c("REF","ALT")]
 h.
 
 
-```r
-variants[,c("sample_id")]
+``` r
+variants[, c("sample_id")]
 ```
 
 
-```{.output}
+``` output
 [1] "SRR2584863" "SRR2584863" "SRR2584863" "SRR2584863" "SRR2584863"
 [6] "SRR2584863"
 ```
@@ -690,11 +922,11 @@ variants[,c("sample_id")]
 i.
 
 
-```r
+``` r
 head(variants)
 ```
 
-```{.output}
+``` output
    sample_id      CHROM    POS ID      REF       ALT QUAL FILTER INDEL IDV IMF
 1 SRR2584863 CP000819.1   9972 NA        T         G   91     NA FALSE  NA  NA
 2 SRR2584863 CP000819.1 263235 NA        G         T   85     NA FALSE  NA  NA
@@ -728,11 +960,11 @@ head(variants)
 j.
 
 
-```r
+``` r
 tail(variants)
 ```
 
-```{.output}
+``` output
      sample_id      CHROM     POS ID REF ALT QUAL FILTER INDEL IDV IMF DP
 796 SRR2589044 CP000819.1 3444175 NA   G   T  184     NA FALSE  NA  NA  9
 797 SRR2589044 CP000819.1 3481820 NA   A   G  225     NA FALSE  NA  NA 12
@@ -766,12 +998,12 @@ tail(variants)
 k.
 
 
-```r
+``` r
 variants$sample_id
 ```
 
 
-```{.output}
+``` output
 [1] "SRR2584863" "SRR2584863" "SRR2584863" "SRR2584863" "SRR2584863"
 [6] "SRR2584863"
 ```
@@ -779,12 +1011,12 @@ variants$sample_id
 l.
 
 
-```r
-variants[variants$REF == "A",]
+``` r
+variants[variants$REF == "A", ]
 ```
 
 
-```{.output}
+``` output
     sample_id      CHROM     POS ID REF ALT QUAL FILTER INDEL IDV IMF DP
 11 SRR2584863 CP000819.1 2407766 NA   A   C  104     NA FALSE  NA  NA  9
 12 SRR2584863 CP000819.1 2446984 NA   A   C  225     NA FALSE  NA  NA 20
@@ -840,27 +1072,27 @@ the screen. You can create a new data frame object by assigning
 them to a new object name:
 
 
-```r
+``` r
 # create a new data frame containing only observations from SRR2584863
 
-SRR2584863_variants <- variants[variants$sample_id == "SRR2584863",]
+SRR2584863_variants <- variants[variants$sample_id == "SRR2584863", ]
 
 # check the dimension of the data frame
 
 dim(SRR2584863_variants)
 ```
 
-```{.output}
+``` output
 [1] 25 29
 ```
 
-```r
+``` r
 # get a summary of the data frame
 
 summary(SRR2584863_variants)
 ```
 
-```{.output}
+``` output
   sample_id            CHROM                POS             ID         
  Length:25          Length:25          Min.   :   9972   Mode:logical  
  Class :character   Class :character   1st Qu.:1331794   NA's:25       
@@ -946,12 +1178,12 @@ This can be a good thing when R gets it right, or a bad thing when the result
 is not what you expect. Consider:
 
 
-```r
+``` r
 snp_chromosomes <- c('3', '11', 'X', '6')
 typeof(snp_chromosomes)
 ```
 
-```{.output}
+``` output
 [1] "character"
 ```
 
@@ -960,20 +1192,20 @@ we have explicitly told R to consider them as characters. However, even if we re
 the quotes from the numbers, R would coerce everything into a character:
 
 
-```r
+``` r
 snp_chromosomes_2 <- c(3, 11, 'X', 6)
 typeof(snp_chromosomes_2)
 ```
 
-```{.output}
+``` output
 [1] "character"
 ```
 
-```r
+``` r
 snp_chromosomes_2[1]
 ```
 
-```{.output}
+``` output
 [1] "3"
 ```
 
@@ -982,40 +1214,40 @@ another. Consider the following vector of characters, which all happen to be
 valid numbers:
 
 
-```r
+``` r
 snp_positions_2 <- c("8762685", "66560624", "67545785", "154039662")
 typeof(snp_positions_2)
 ```
 
-```{.output}
+``` output
 [1] "character"
 ```
 
-```r
+``` r
 snp_positions_2[1]
 ```
 
-```{.output}
+``` output
 [1] "8762685"
 ```
 
 Now we can coerce `snp_positions_2` into a numeric type using `as.numeric()`:
 
 
-```r
+``` r
 snp_positions_2 <- as.numeric(snp_positions_2)
 typeof(snp_positions_2)
 ```
 
-```{.output}
+``` output
 [1] "double"
 ```
 
-```r
+``` r
 snp_positions_2[1]
 ```
 
-```{.output}
+``` output
 [1] 8762685
 ```
 
@@ -1023,11 +1255,11 @@ Sometimes coercion is straight forward, but what would happen if we tried
 using `as.numeric()` on `snp_chromosomes_2`
 
 
-```r
+``` r
 snp_chromosomes_2 <- as.numeric(snp_chromosomes_2)
 ```
 
-```{.warning}
+``` warning
 Warning: NAs introduced by coercion
 ```
 
@@ -1035,61 +1267,44 @@ If we check, we will see that an `NA` value (R's default value for missing
 data) has been introduced.
 
 
-```r
+``` r
 snp_chromosomes_2
 ```
 
-```{.output}
+``` output
 [1]  3 11 NA  6
 ```
 
 Trouble can really start when we try to coerce a factor. For example, when we
-try to coerce the `sample_id` column in our data frame into a numeric mode
+try to coerce the `factor_snps` vector into a numeric mode
 look at the result:
 
 
-```r
-as.numeric(variants$sample_id)
+``` r
+as.numeric(factor_snps)
 ```
 
-```{.warning}
-Warning: NAs introduced by coercion
-```
-
-```{.output}
-  [1] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
- [26] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
- [51] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
- [76] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
-[101] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
-[126] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
-[151] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
-[176] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
-[201] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
-[226] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
-[251] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
-[276] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
-[301] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
-[326] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
-[351] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
-[376] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
-[401] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
-[426] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
-[451] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
-[476] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
-[501] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
-[526] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
-[551] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
-[576] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
-[601] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
-[626] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
-[651] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
-[676] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
-[701] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
-[726] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
-[751] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
-[776] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
-[801] NA
+``` output
+  [1] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ [38] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ [75] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+[112] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+[149] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+[186] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 4 4 4 4 4 4 4 4 4 4 4
+[223] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[260] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[297] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[334] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[371] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+[408] 4 4 4 4 4 4 4 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+[445] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+[482] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+[519] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+[556] 3 3 3 3 3 3 3 3 3 3 3 3 3 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+[593] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+[630] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+[667] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+[704] 2 2 2 2
 ```
 
 Strangely, it works! Almost. Instead of giving an error message, R returns
@@ -1102,7 +1317,7 @@ If you need to coerce an entire column you can overwrite it using an expression
 like this one:
 
 
-```r
+``` r
 # make the 'REF' column a character type column
 
 variants$REF <- as.character(variants$REF)
@@ -1111,7 +1326,7 @@ variants$REF <- as.character(variants$REF)
 typeof(variants$REF)
 ```
 
-```{.output}
+``` output
 [1] "character"
 ```
 
@@ -1151,7 +1366,7 @@ to know.
 
 There are lots of arithmetic functions you may want to apply to your data
 frame, covering those would be a course in itself (there is some starting
-material [here](https://swcarpentry.github.io/r-novice-inflammation/15-supp-loops-in-depth/)). Our lessons will cover some additional summary statistical functions in
+material in [the _Loops in R_ episode of one of the Software Carpentry lessons](https://swcarpentry.github.io/r-novice-inflammation/15-supp-loops-in-depth.html)). Our lessons will cover some additional summary statistical functions in
 a subsequent lesson, but overall we will focus on data cleaning and
 visualization.
 
@@ -1160,23 +1375,23 @@ individual column. Let's look at the "DP" or filtered depth. This value shows th
 reads that support each of the reported variants.
 
 
-```r
+``` r
 max(variants$DP)
 ```
 
-```{.output}
+``` output
 [1] 79
 ```
 
 You can sort a data frame using the `order()` function:
 
 
-```r
+``` r
 sorted_by_DP <- variants[order(variants$DP), ]
 head(sorted_by_DP$DP)
 ```
 
-```{.output}
+``` output
 [1] 2 2 2 2 2 2
 ```
 
@@ -1193,12 +1408,12 @@ variants with the greatest filtered depth ("DP").
 ## Solution
 
 
-```r
+``` r
    sorted_by_DP <- variants[order(variants$DP, decreasing = TRUE), ]
    head(sorted_by_DP$DP)
 ```
 
-```{.output}
+``` output
 [1] 79 46 41 29 29 27
 ```
 
@@ -1209,14 +1424,14 @@ variants with the greatest filtered depth ("DP").
 You can rename columns:
 
 
-```r
+``` r
 colnames(variants)[colnames(variants) == "sample_id"] <- "strain"
 
 # check the column name (hint names are returned as a vector)
 colnames(variants)
 ```
 
-```{.output}
+``` output
  [1] "strain"        "CHROM"         "POS"           "ID"           
  [5] "REF"           "ALT"           "QUAL"          "FILTER"       
  [9] "INDEL"         "IDV"           "IMF"           "DP"           
@@ -1233,7 +1448,7 @@ We can save data to a file. We will save our `SRR2584863_variants` object
 to a .csv file using the `write.csv()` function:
 
 
-```r
+``` r
 write.csv(SRR2584863_variants, file = "data/SRR2584863_variants.csv")
 ```
 
@@ -1261,12 +1476,12 @@ First, in the RStudio menu go to **File**, select **Import Dataset**, and
 choose **From Excel...** (notice there are several other options you can
 explore).
 
-<img src="fig/rstudio_import_menu.png " alt="rstudio import menu" style="width: 600px;"/>
+![RStudio import menu](fig/rstudio_import_menu.png)
 
 Next, under **File/Url:** click the <KBD>Browse</KBD> button and navigate to the **Ecoli\_metadata.xlsx** file located at `/home/dcuser/dc_sample_data/R`.
 You should now see a preview of the data to be imported:
 
-<img src="fig/rstudio_import_screen.png " alt="rstudio import screen" style="width: 1200px;"/>
+![RStudio import screen](fig/rstudio_import_screen.png)
 
 Notice that you have the option to change the data type of each variable by
 clicking arrow (drop-down menu) next to each column title. Under **Import
@@ -1286,11 +1501,11 @@ frame:
 
 
 
-```r
+``` r
 head(Ecoli_metadata)
 ```
 
-```{.output}
+``` output
 # A tibble: 6 × 7
   sample   generation clade   strain cit     run       genome_size
   <chr>         <dbl> <chr>   <chr>  <chr>   <chr>           <dbl>
@@ -1333,52 +1548,52 @@ H) Save the edited Ecoli\_metadata data frame as "exercise\_solution.csv" in you
 ## Solution
 
 
-```r
+``` r
 dim(Ecoli_metadata)
 ```
 
-```{.output}
+``` output
 [1] 30  7
 ```
 
-```r
+``` r
 levels(as.factor(Ecoli_metadata$cit))
 ```
 
-```{.output}
+``` output
 [1] "minus"   "plus"    "unknown"
 ```
 
-```r
+``` r
 table(as.factor(Ecoli_metadata$cit))
 ```
 
-```{.output}
+``` output
 
   minus    plus unknown 
       9       9      12 
 ```
 
-```r
-Ecoli_metadata[7,7]
+``` r
+Ecoli_metadata[7, 7]
 ```
 
-```{.output}
+``` output
 # A tibble: 1 × 1
   genome_size
         <dbl>
 1        4.62
 ```
 
-```r
+``` r
 median(Ecoli_metadata$genome_size)
 ```
 
-```{.output}
+``` output
 [1] 4.625
 ```
 
-```r
+``` r
 colnames(Ecoli_metadata)[colnames(Ecoli_metadata) == "sample"] <- "sample_id"
 Ecoli_metadata$genome_size_bp <- Ecoli_metadata$genome_size * 1000000
 write.csv(Ecoli_metadata, file = "exercise_solution.csv")
@@ -1395,5 +1610,3 @@ write.csv(Ecoli_metadata, file = "exercise_solution.csv")
 - Base R has many useful functions for manipulating your data, but all of R's capabilities are greatly enhanced by software packages developed by the community
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
-
-

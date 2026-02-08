@@ -45,8 +45,8 @@ a popular online forum.
 
 ## Tip: Asking for help using online forums:
 
-- When searching for R help, look for answers with the [r](https://stackoverflow.com/questions/tagged/r) tag.
-- Get an account; not required to view answers but to required to post
+- When searching for R help, look for [answers with the 'r' tag](https://stackoverflow.com/questions/tagged/r).
+- Get an account; not required to view answers, but you need an account to post
 - Put in effort to check thoroughly before you post a question; folks get
   annoyed if you ask a very common question that has been answered multiple
   times
@@ -94,10 +94,10 @@ loaded via a namespace (and not attached):
 Many times, there may be some issues with your data and the way it is formatted.
 In that case, you may want to share that data with someone else. However, you
 may not need to share the whole dataset; looking at a subset of your 50,000 row,
-10,000 column dataframe may be TMI (too much information)! You can take an
-object you have in memory such as dataframe (if you don't know what this means
+10,000 column data frame may be TMI (too much information)! You can take an
+object you have in memory such as data frame (if you don't know what this means
 yet, we will get to it!) and save it to a file. In our example we will use the
-`dput()` function on the `iris` dataframe which is an example dataset that is
+`dput()` function on the `iris` data frame which is an example dataset that is
 installed in R:
 
 ```
@@ -124,7 +124,7 @@ the name of the object, in this case the `iris` data frame, and passing a
 filename to the `file=` argument.
 
 
-```r
+``` r
 saveRDS(iris, file="iris.rds") # By convention, we use the .rds file extension
 ```
 
@@ -151,11 +151,11 @@ they come up commonly:
   the number tells you what ordinal number begins the line, for example:
 
 
-```r
+``` r
 1:101 # generates the sequence of numbers from 1 to 101
 ```
 
-```{.output}
+``` output
   [1]   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18
  [19]  19  20  21  22  23  24  25  26  27  28  29  30  31  32  33  34  35  36
  [37]  37  38  39  40  41  42  43  44  45  46  47  48  49  50  51  52  53  54

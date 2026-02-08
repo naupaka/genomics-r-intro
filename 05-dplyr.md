@@ -48,7 +48,7 @@ packages give you access to more functions. You need to install a package and
 then load it to be able to use it.
 
 
-```r
+``` r
 install.packages("dplyr") ## installs dplyr package
 install.packages("tidyr") ## installs tidyr package
 install.packages("ggplot2") ## installs ggplot2 package
@@ -59,7 +59,7 @@ You might get asked to choose a CRAN mirror -- this is asking you to
 choose a site to download the package from. The choice doesn't matter too much; I'd recommend choosing the RStudio mirror.
 
 
-```r
+``` r
 library("dplyr")          ## loads in dplyr package to use
 library("tidyr")          ## loads in tidyr package to use
 library("ggplot2")          ## loads in ggplot2 package to use
@@ -77,7 +77,7 @@ It may be temping to install the `tidyverse` package, as it contains many
 useful collection of packages for this lesson and beyond. However, when
 teaching or following this lesson, we advise that participants install
 `dplyr`, `readr`, `ggplot2`, and `tidyr` individually as shown above.
-Otherwise, a substaial amount of the lesson will be spend waiting for the
+Otherwise, a substantial amount of the lesson will be spend waiting for the
 installation to complete.
 
 
@@ -103,7 +103,7 @@ back just what you need for analysis in R.
 
 ### Loading .csv files in tidy style
 
-The Tidyverse's `readr` package provides its own unique way of loading .csv files in to R using `read_csv()`, which is similar to `read.csv()`. `read_csv()` allows users to load in their data faster, doesn't create row names, and allows you to access non-standard variable names (ie. variables that start with numbers of contain spaces), and outputs your data on the R console in a tidier way. In short, it's a much friendlier way of loading in potentially messy data.
+The Tidyverse's `readr` package provides its own unique way of loading .csv files in to R using `read_csv()`, which is similar to `read.csv()`. `read_csv()` allows users to load in their data faster, doesn't create row names, and allows you to access non-standard variable names (i.e. variables that start with numbers of contain spaces), and outputs your data on the R console in a tidier way. In short, it's a much friendlier way of loading in potentially messy data.
 
 Now let's load our vcf .csv file using `read_csv()`:
 
@@ -114,7 +114,7 @@ Now let's load our vcf .csv file using `read_csv()`:
 Similar to `str()`, which comes built into R, `glimpse()` is a `dplyr` function that (as the name suggests) gives a glimpse of the data frame.
 
 
-```{.output}
+``` output
 Rows: 801
 Columns: 29
 $ sample_id     <chr> "SRR2584863", "SRR2584863", "SRR2584863", "SRR2584863", …
@@ -155,11 +155,11 @@ In the above output, we can already gather some information about `variants`, su
 To select columns of a data frame, use `select()`. The first argument to this function is the data frame (`variants`), and the subsequent arguments are the columns to keep.
 
 
-```r
+``` r
 select(variants, sample_id, REF, ALT, DP)
 ```
 
-```{.output}
+``` output
 # A tibble: 801 × 4
    sample_id  REF                              ALT                            DP
    <chr>      <chr>                            <chr>                       <dbl>
@@ -180,11 +180,11 @@ To select all columns *except* certain ones, put a "-" in front of
 the variable to exclude it.
 
 
-```r
+``` r
 select(variants, -CHROM)
 ```
 
-```{.output}
+``` output
 # A tibble: 801 × 28
    sample_id      POS ID    REF      ALT    QUAL FILTER INDEL   IDV    IMF    DP
    <chr>        <dbl> <lgl> <chr>    <chr> <dbl> <lgl>  <lgl> <dbl>  <dbl> <dbl>
@@ -207,11 +207,11 @@ select(variants, -CHROM)
 `dplyr` also provides useful functions to select columns based on their names. For instance, `ends_with()` allows you to select columns that ends with specific letters. For instance, if you wanted to select columns that end with the letter "B":
 
 
-```r
+``` r
 select(variants, ends_with("B"))
 ```
 
-```{.output}
+``` output
 # A tibble: 801 × 8
       VDB   RPB   MQB   BQB   MQSB    SGB ICB   HOB  
     <dbl> <dbl> <dbl> <dbl>  <dbl>  <dbl> <lgl> <lgl>
@@ -234,14 +234,14 @@ select(variants, ends_with("B"))
 
 Create a table that contains all the columns with the letter "i" and column "POS",
 without columns "Indiv" and "FILTER".
-Hint: look at for a function called `contains()`, which can be found in the help documentation for ends with we just covered (`?ends_with`). Note that contains() is not case sensistive.
+Hint: look at for a function called `contains()`, which can be found in the help documentation for ends with we just covered (`?ends_with`). Note that contains() is not case sensitive.
 
 :::::::::::::::  solution
 
 ## Solution
 
 
-```r
+``` r
 # First, we select "POS" and all columns with letter "i". This will contain columns Indiv and FILTER. 
 variants_subset <- select(variants, POS, contains("i"))
 # Next, we remove columns Indiv and FILTER
@@ -249,7 +249,7 @@ variants_result <- select(variants_subset, -Indiv, -FILTER)
 variants_result
 ```
 
-```{.output}
+``` output
 # A tibble: 801 × 7
        POS sample_id  ID    INDEL   IDV    IMF ICB  
      <dbl> <chr>      <lgl> <lgl> <dbl>  <dbl> <lgl>
@@ -275,12 +275,12 @@ We can also get to `variants_result` in one line of code:
 ## Alternative solution
 
 
-```r
+``` r
 variants_result <- select(variants, POS, contains("i"), -Indiv, -FILTER)
 variants_result
 ```
 
-```{.output}
+``` output
 # A tibble: 801 × 7
        POS sample_id  ID    INDEL   IDV    IMF ICB  
      <dbl> <chr>      <lgl> <lgl> <dbl>  <dbl> <lgl>
@@ -304,11 +304,11 @@ variants_result
 To choose rows, use `filter()`:
 
 
-```r
+``` r
 filter(variants, sample_id == "SRR2584863")
 ```
 
-```{.output}
+``` output
 # A tibble: 25 × 29
    sample_id  CHROM        POS ID    REF   ALT    QUAL FILTER INDEL   IDV    IMF
    <chr>      <chr>      <dbl> <lgl> <chr> <chr> <dbl> <lgl>  <lgl> <dbl>  <dbl>
@@ -333,12 +333,12 @@ filter(variants, sample_id == "SRR2584863")
 Here are a few examples:
 
 
-```r
+``` r
 # rows for which the reference genome has T or G
 filter(variants, REF %in% c("T", "G"))
 ```
 
-```{.output}
+``` output
 # A tibble: 340 × 29
    sample_id CHROM    POS ID    REF   ALT    QUAL FILTER INDEL   IDV   IMF    DP
    <chr>     <chr>  <dbl> <lgl> <chr> <chr> <dbl> <lgl>  <lgl> <dbl> <dbl> <dbl>
@@ -358,12 +358,12 @@ filter(variants, REF %in% c("T", "G"))
 #   MQ <dbl>, Indiv <chr>, gt_PL <dbl>, gt_GT <dbl>, gt_GT_alleles <chr>
 ```
 
-```r
+``` r
 # rows that have TRUE in the column INDEL
 filter(variants, INDEL)
 ```
 
-```{.output}
+``` output
 # A tibble: 101 × 29
    sample_id CHROM    POS ID    REF   ALT    QUAL FILTER INDEL   IDV   IMF    DP
    <chr>     <chr>  <dbl> <lgl> <chr> <chr> <dbl> <lgl>  <lgl> <dbl> <dbl> <dbl>
@@ -383,12 +383,12 @@ filter(variants, INDEL)
 #   MQ <dbl>, Indiv <chr>, gt_PL <dbl>, gt_GT <dbl>, gt_GT_alleles <chr>
 ```
 
-```r
+``` r
 # rows that don't have missing data in the IDV column
 filter(variants, !is.na(IDV))
 ```
 
-```{.output}
+``` output
 # A tibble: 101 × 29
    sample_id CHROM    POS ID    REF   ALT    QUAL FILTER INDEL   IDV   IMF    DP
    <chr>     <chr>  <dbl> <lgl> <chr> <chr> <dbl> <lgl>  <lgl> <dbl> <dbl> <dbl>
@@ -415,12 +415,12 @@ existing at that site. `filter()` can be useful for selecting mutations that
 have a QUAL score above a certain threshold:
 
 
-```r
+``` r
 # rows with QUAL values greater than or equal to 100
 filter(variants, QUAL >= 100)
 ```
 
-```{.output}
+``` output
 # A tibble: 666 × 29
    sample_id CHROM    POS ID    REF   ALT    QUAL FILTER INDEL   IDV   IMF    DP
    <chr>     <chr>  <dbl> <lgl> <chr> <chr> <dbl> <lgl>  <lgl> <dbl> <dbl> <dbl>
@@ -443,13 +443,13 @@ filter(variants, QUAL >= 100)
 `filter()` allows you to combine multiple conditions. You can separate them using a `,` as arguments to the function, they will be combined using the `&` (AND) logical operator. If you need to use the `|` (OR) logical operator, you can specify it explicitly:
 
 
-```r
+``` r
 # this is equivalent to:
 #   filter(variants, sample_id == "SRR2584863" & QUAL >= 100)
 filter(variants, sample_id == "SRR2584863", QUAL >= 100)
 ```
 
-```{.output}
+``` output
 # A tibble: 19 × 29
    sample_id CHROM    POS ID    REF   ALT    QUAL FILTER INDEL   IDV   IMF    DP
    <chr>     <chr>  <dbl> <lgl> <chr> <chr> <dbl> <lgl>  <lgl> <dbl> <dbl> <dbl>
@@ -477,12 +477,12 @@ filter(variants, sample_id == "SRR2584863", QUAL >= 100)
 #   MQ <dbl>, Indiv <chr>, gt_PL <dbl>, gt_GT <dbl>, gt_GT_alleles <chr>
 ```
 
-```r
+``` r
 # using `|` logical operator
 filter(variants, sample_id == "SRR2584863", (MQ >= 50 | QUAL >= 100))
 ```
 
-```{.output}
+``` output
 # A tibble: 23 × 29
    sample_id  CHROM        POS ID    REF   ALT    QUAL FILTER INDEL   IDV    IMF
    <chr>      <chr>      <dbl> <lgl> <chr> <chr> <dbl> <lgl>  <lgl> <dbl>  <dbl>
@@ -510,18 +510,18 @@ filter(variants, sample_id == "SRR2584863", (MQ >= 50 | QUAL >= 100))
 Select all the mutations that occurred between the positions 1e6 (one million)
 and 2e6 (inclusive) that have a QUAL greater than 200, and exclude INDEL mutations.
 Hint: to flip logical values such as TRUE to a FALSE, we can use to negation symbol
-"!". (eg. !TRUE == FALSE).
+"!". (e.g. !TRUE == FALSE).
 
 :::::::::::::::  solution
 
 ## Solution
 
 
-```r
+``` r
 filter(variants, POS >= 1e6 & POS <= 2e6, QUAL > 200, !INDEL)
 ```
 
-```{.output}
+``` output
 # A tibble: 77 × 29
    sample_id CHROM    POS ID    REF   ALT    QUAL FILTER INDEL   IDV   IMF    DP
    <chr>     <chr>  <dbl> <lgl> <chr> <chr> <dbl> <lgl>  <lgl> <dbl> <dbl> <dbl>
@@ -558,13 +558,13 @@ part of `dplyr`. If you use RStudio, you can type the pipe with
 or <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>M</kbd> if you're using a Mac.
 
 
-```r
+``` r
 variants %>%
   filter(sample_id == "SRR2584863") %>%
   select(REF, ALT, DP)
 ```
 
-```{.output}
+``` output
 # A tibble: 25 × 3
    REF                              ALT                                       DP
    <chr>                            <chr>                                  <dbl>
@@ -590,7 +590,7 @@ to the `filter()` and `select()` functions any more.
 
 Some may find it helpful to read the pipe like the word "then". For instance,
 in the above example, we took the data frame `variants`, *then* we `filter`ed
-for rows where `sample_id` was SRR2584863, *then* we `select`ed the `REF`, `ALT`, and `DP` columns, *then* we showed only the first six rows.
+for rows where `sample_id` was SRR2584863, *then* we `select`ed the `REF`, `ALT`, and `DP` columns.
 The **`dplyr`** functions by themselves are somewhat simple,
 but by combining them into linear workflows with the pipe, we can accomplish
 more complex manipulations of data frames.
@@ -599,7 +599,7 @@ If we want to create a new object with this smaller version of the data we
 can do so by assigning it a new name:
 
 
-```r
+``` r
 SRR2584863_variants <- variants %>%
   filter(sample_id == "SRR2584863") %>%
   select(REF, ALT, DP)
@@ -609,11 +609,11 @@ This new object includes all of the data from this sample. Let's look at just
 the first six rows to confirm it's what we want:
 
 
-```r
+``` r
 SRR2584863_variants
 ```
 
-```{.output}
+``` output
 # A tibble: 25 × 3
    REF                              ALT                                       DP
    <chr>                            <chr>                                  <dbl>
@@ -633,11 +633,11 @@ SRR2584863_variants
 Similar to `head()` and `tail()` functions, we can also look at the first or last six rows using tidyverse function `slice()`. Slice is a more versatile function that allows users to specify a range to view:
 
 
-```r
+``` r
 SRR2584863_variants %>% slice(1:6)
 ```
 
-```{.output}
+``` output
 # A tibble: 6 × 3
   REF      ALT          DP
   <chr>    <chr>     <dbl>
@@ -650,11 +650,11 @@ SRR2584863_variants %>% slice(1:6)
 ```
 
 
-```r
+``` r
 SRR2584863_variants %>% slice(10:25)
 ```
 
-```{.output}
+``` output
 # A tibble: 16 × 3
    REF   ALT      DP
    <chr> <chr> <dbl>
@@ -690,14 +690,14 @@ Showing only 5th through 11th rows of columns `REF`, `ALT`, and `POS`.
 ## Solution
 
 
-```r
+``` r
  variants %>%
  filter(sample_id == "SRR2584863" & DP >= 10) %>%
  slice(5:11) %>%
  select(sample_id, DP, REF, ALT, POS)
 ```
 
-```{.output}
+``` output
 # A tibble: 7 × 5
   sample_id     DP REF   ALT       POS
   <chr>      <dbl> <chr> <chr>   <dbl>
@@ -729,12 +729,12 @@ We can use `mutate` to add a column (`POLPROB`) to our `variants` data frame tha
 the probability of a polymorphism at that site given the data.
 
 
-```r
+``` r
 variants %>%
   mutate(POLPROB = 1 - (10 ^ -(QUAL/10)))
 ```
 
-```{.output}
+``` output
 # A tibble: 801 × 30
    sample_id  CHROM        POS ID    REF   ALT    QUAL FILTER INDEL   IDV    IMF
    <chr>      <chr>      <dbl> <lgl> <chr> <chr> <dbl> <lgl>  <lgl> <dbl>  <dbl>
@@ -768,26 +768,26 @@ line to the above code to only show those columns.
 ## Solution
 
 
-```r
+``` r
 variants %>%
  mutate(POLPROB = 1 - 10 ^ -(QUAL/10)) %>%
  select(sample_id, POS, QUAL, POLPROB)
 ```
 
-```{.output}
+``` output
 # A tibble: 801 × 4
    sample_id      POS  QUAL POLPROB
    <chr>        <dbl> <dbl>   <dbl>
- 1 SRR2584863    9972    91    1.00
- 2 SRR2584863  263235    85    1.00
- 3 SRR2584863  281923   217    1   
- 4 SRR2584863  433359    64    1.00
- 5 SRR2584863  473901   228    1   
- 6 SRR2584863  648692   210    1   
- 7 SRR2584863 1331794   178    1   
- 8 SRR2584863 1733343   225    1   
- 9 SRR2584863 2103887    56    1.00
-10 SRR2584863 2333538   167    1   
+ 1 SRR2584863    9972    91   1.000
+ 2 SRR2584863  263235    85   1.000
+ 3 SRR2584863  281923   217   1    
+ 4 SRR2584863  433359    64   1.000
+ 5 SRR2584863  473901   228   1    
+ 6 SRR2584863  648692   210   1    
+ 7 SRR2584863 1331794   178   1    
+ 8 SRR2584863 1733343   225   1    
+ 9 SRR2584863 2103887    56   1.000
+10 SRR2584863 2333538   167   1    
 # ℹ 791 more rows
 ```
 
@@ -806,13 +806,13 @@ We can use `group_by()` to tally the number of mutations detected in each sample
 using the function `tally()`:
 
 
-```r
+``` r
 variants %>%
   group_by(sample_id) %>%
   tally()
 ```
 
-```{.output}
+``` output
 # A tibble: 3 × 2
   sample_id      n
   <chr>      <int>
@@ -824,12 +824,12 @@ variants %>%
 Since counting or tallying values is a common use case for `group_by()`, an alternative function was created to bypasses `group_by()` using the function `count()`:
 
 
-```r
+``` r
 variants %>%
   count(sample_id)
 ```
 
-```{.output}
+``` output
 # A tibble: 3 × 2
   sample_id      n
   <chr>      <int>
@@ -842,19 +842,20 @@ variants %>%
 
 ## Challenge
 
-- How many mutations are INDELs?
+- Count how many mutations are INDELS vs substitutions (aka not indels). 
+- Hint: INDELS is TRUE/FALSE column in the data.
 
 :::::::::::::::  solution
 
 ## Solution
 
 
-```r
+``` r
 variants %>%
   count(INDEL)
 ```
 
-```{.output}
+``` output
 # A tibble: 2 × 2
   INDEL     n
   <lgl> <int>
@@ -891,7 +892,7 @@ to use `na.rm = TRUE` (`rm` stands for remove).
 So to view the mean, median, maximum, and minimum filtered depth (`DP`) for each sample:
 
 
-```r
+``` r
 variants %>%
   group_by(sample_id) %>%
   summarize(
@@ -901,7 +902,7 @@ variants %>%
     max_DP = max(DP))
 ```
 
-```{.output}
+``` output
 # A tibble: 3 × 5
   sample_id  mean_DP median_DP min_DP max_DP
   <chr>        <dbl>     <dbl>  <dbl>  <dbl>
@@ -909,6 +910,17 @@ variants %>%
 2 SRR2584866    10.6      10        2     79
 3 SRR2589044     9.3       9.5      3     16
 ```
+:::::::::::::::::::::::::::::::::::::::::  callout
+## Grouped Data Frames in Tidyverse
+
+When you group a data frame with `group_by()`, you get a grouped data frame. This is a special type of data frame that has all the properties of a regular data frame but also has an additional attribute that describes the grouping structure. The primary advantage of a grouped data frame is that it allows you to work with each group of observations as if they were a separate data frame. 
+
+Operations like `summarise()` and `mutate()` will be applied to each group separately. This is particularly useful when you want to perform calculations on subsets of your data. 
+
+To remove the grouping structure from a grouped data frame, you can use the `ungroup()` function. This will return a regular data frame.
+
+For more details, refer to the [dplyr documentation on grouping](https://dplyr.tidyverse.org/articles/grouping.html).
+::::::::::::::::::::::::::::::::::::::::::::::::::
 
 ### Reshaping data frames
 
@@ -917,23 +929,27 @@ It can sometimes be useful to transform the "long" tidy format, into the wide fo
 `pivot_wider()` takes a data frame as the first argument, and two arguments: the column name that will become the columns  and the column name that will become the cells in the wide data.
 
 
-```r
+``` r
 variants_wide <- variants %>%
   group_by(sample_id, CHROM) %>%
   summarize(mean_DP = mean(DP)) %>%
   pivot_wider(names_from = sample_id, values_from = mean_DP)
 ```
 
-```{.output}
-`summarise()` has grouped output by 'sample_id'. You can override using the
-`.groups` argument.
+``` output
+`summarise()` has regrouped the output.
+ℹ Summaries were computed grouped by sample_id and CHROM.
+ℹ Output is grouped by sample_id.
+ℹ Use `summarise(.groups = "drop_last")` to silence this message.
+ℹ Use `summarise(.by = c(sample_id, CHROM))` for per-operation grouping
+  (`?dplyr::dplyr_by`) instead.
 ```
 
-```r
+``` r
 variants_wide
 ```
 
-```{.output}
+``` output
 # A tibble: 1 × 4
   CHROM      SRR2584863 SRR2584866 SRR2589044
   <chr>           <dbl>      <dbl>      <dbl>
@@ -943,12 +959,12 @@ variants_wide
 The opposite operation of `pivot_wider()` is taken care by `pivot_longer()`. We specify the names of the new columns, and here add `-CHROM` as this column shouldn't be affected by the reshaping:
 
 
-```r
+``` r
 variants_wide %>%
   pivot_longer(-CHROM, names_to = "sample_id", values_to = "mean_DP")
 ```
 
-```{.output}
+``` output
 # A tibble: 3 × 3
   CHROM      sample_id  mean_DP
   <chr>      <chr>        <dbl>
@@ -959,9 +975,9 @@ variants_wide %>%
 
 ### Resources
 
-- [Handy dplyr cheatsheet](https://github.com/rstudio/cheatsheets/raw/master/data-transformation.pdf)
+- [Handy dplyr cheatsheet](https://raw.githubusercontent.com/rstudio/cheatsheets/main/data-transformation.pdf)
 
-- [Much of this lesson was copied or adapted from Jeff Hollister's materials](https://usepa.github.io/introR/2015/01/14/03-Clean/)
+- [Much of this lesson was copied or adapted from Jeff Hollister's materials](https://github.com/USEPA/workshops/blob/main/r/2015/introR/rmd_posts/2015-01-14-03-Clean.Rmd)
 
 :::::::::::::::::::::::::::::::::::::::: keypoints
 
