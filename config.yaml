@@ -11,7 +11,7 @@
 carpentry: 'dc'
 
 # Overall title for pages.
-title: 'Intro to R and RStudio for Genomics'
+title: 'Data Analysis and Visualization with R for Genomics'
 
 # Date the lesson was created (YYYY-MM-DD, this is empty by default)
 created: '2018-03-12'
@@ -21,7 +21,7 @@ keywords: 'software, data, lesson, The Carpentries'
 
 # Life cycle stage of the lesson
 # possible values: pre-alpha, alpha, beta, stable
-life_cycle: 'alpha'
+life_cycle: 'beta'
 
 # License of the lesson materials (recommended CC-BY 4.0)
 license: 'CC-BY 4.0'
@@ -66,8 +66,7 @@ episodes:
 - 04-bioconductor-vcfr.Rmd
 - 05-dplyr.Rmd
 - 06-data-visualization.Rmd
-- 07-knitr-markdown.Rmd
-- 08-r-help.Rmd
+- 07-r-help.Rmd
 
 # Information for Learners
 learners: 
